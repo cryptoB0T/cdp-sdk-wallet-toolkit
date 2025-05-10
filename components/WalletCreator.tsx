@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../styles/WalletCreator.module.css';
 
 type WalletType = 'EVM' | 'SOLANA';
