@@ -145,7 +145,7 @@ export default function WalletCreator() {
                 {acc.balances && acc.balances.length > 0 ? (
                   acc.balances.map((balance, idx) => (
                     <p key={idx}>
-                      {balance.amount} {balance.currency}
+                      {balance.formattedAmount || balance.amount} {balance.currency}
                     </p>
                   ))
                 ) : (
@@ -186,7 +186,7 @@ export default function WalletCreator() {
                 setIsCreatingSmartAccount(false);
               }
             }}
-            disabled={isCreatingSmartAccount || smartAccountAddress}
+            disabled={isCreatingSmartAccount || !!smartAccountAddress}
             className={styles.button}
           >
             {isCreatingSmartAccount ? 'Creating Smart Account...' : 'Create Smart Account'}

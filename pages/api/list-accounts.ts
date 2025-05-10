@@ -1,6 +1,30 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { CdpClient } from "@coinbase/cdp-sdk";
 
+// Helper function to format token amounts with proper decimals
+function formatAmount(amount: string, decimals: number): string {
+  if (!amount) return '0';
+  
+  // Convert to a decimal string
+  const amountBN = BigInt(amount);
+  const divisor = BigInt(10) ** BigInt(decimals);
+  
+  if (amountBN === BigInt(0)) return '0';
+  
+  // Integer part
+  const integerPart = (amountBN / divisor).toString();
+  
+  // Fractional part (if any)
+  const remainder = amountBN % divisor;
+  if (remainder === BigInt(0)) return integerPart;
+  
+  let fractionalPart = remainder.toString().padStart(decimals, '0');
+  // Remove trailing zeros
+  fractionalPart = fractionalPart.replace(/0+$/, '');
+  
+  return `${integerPart}.${fractionalPart}`;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -14,6 +38,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       apiKeySecret: process.env.CDP_API_KEY_SECRET,
       walletSecret: process.env.CDP_WALLET_SECRET,
     });
+
+    // Custom replacer for BigInt serialization
+    const safeJsonReplacer = (key: string, value: any) => {
+      if (typeof value === 'bigint') {
+        return value.toString();
+      }
+      return value;
+    };
 
     let accounts;
     if (type === 'EVM') {
@@ -29,39 +61,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             network: 'base-sepolia'
           });
 
-          // Custom replacer for BigInt serialization
-          const replacer = (key, value) =>
-            typeof value === 'bigint' ? value.toString() : value;
-
-          console.log('Balance response:', JSON.stringify(balanceResponse, replacer, 2));
+          console.log('Balance response:', JSON.stringify(balanceResponse, safeJsonReplacer, 2));
 
           // Initialize balances array
           const balances = [];
 
-          // Add native token balance if present
-          if (balanceResponse?.nativeToken?.value) {
-            const nativeBalance = balanceResponse.nativeToken.value.toString();
-            console.log('Found native token balance:', nativeBalance);
-            balances.push({
-              currency: 'ETH',
-              amount: nativeBalance
+          // Process balances from the response format
+          if (balanceResponse?.balances && balanceResponse.balances.length > 0) {
+            balanceResponse.balances.forEach(balanceItem => {
+              // Check if this is a native token (ETH)
+              const isNativeToken = balanceItem.token?.contractAddress === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+              
+              // Format the balance with proper decimals
+              const rawAmount = balanceItem.amount?.amount || '0';
+              const decimals = parseInt(balanceItem.amount?.decimals || '18', 10);
+              
+              // Add to balances array
+              balances.push({
+                currency: isNativeToken ? 'ETH' : (balanceItem.token?.symbol || 'Unknown'),
+                amount: rawAmount,
+                formattedAmount: formatAmount(rawAmount.toString(), decimals)
+              });
             });
-          }
-
-          // Add token balances if present
-          if (balanceResponse?.tokens) {
-            balances.push(...balanceResponse.tokens.map(token => ({
-              currency: token.symbol || 'Unknown',
-              amount: token.value?.toString() || '0'
-            })));
-          }
-
-          // Add other token balances
-          if (balanceResponse?.tokens) {
-            balances.push(...balanceResponse.tokens.map(balance => ({
-              currency: balance.currency || balance.symbol || 'Unknown',
-              amount: (balance.amount || '0').toString()
-            })));
           }
 
           return {
@@ -71,7 +92,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
       );
 
-      res.status(200).json({ accounts: accountsWithBalances });
+      // Serialize and then parse to ensure all BigInt values are converted to strings
+      const safeAccounts = JSON.parse(JSON.stringify(accountsWithBalances, safeJsonReplacer));
+      res.status(200).json({ accounts: safeAccounts });
     } else if (type === 'SOLANA') {
       const response = await cdp.solana.listAccounts();
       accounts = response.accounts;
@@ -79,18 +102,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Fetch balances for each account
       const accountsWithBalances = await Promise.all(
         accounts.map(async (account) => {
-          const balances = await cdp.solana.listTokenBalances({
-            address: account.address,
-            network: 'solana-devnet'
-          });
+          // For Solana, we'll just return the account for now since listTokenBalances isn't available
+          // This can be implemented when the proper method is available
           return {
             ...account,
-            balances
+            balances: []
           };
         })
       );
 
-      res.status(200).json({ accounts: accountsWithBalances });
+      // Serialize and then parse to ensure all BigInt values are converted to strings
+      const safeAccounts = JSON.parse(JSON.stringify(accountsWithBalances, safeJsonReplacer));
+      res.status(200).json({ accounts: safeAccounts });
     } else {
       return res.status(400).json({ error: 'Invalid wallet type' });
     }
