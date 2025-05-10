@@ -14,6 +14,8 @@ export default function WalletCreator() {
   const [evmNetwork, setEvmNetwork] = useState<EVMNetwork>('base-sepolia');
   const [accountName, setAccountName] = useState('');
   const [accounts, setAccounts] = useState([]);
+  const [smartAccountAddress, setSmartAccountAddress] = useState('');
+  const [isCreatingSmartAccount, setIsCreatingSmartAccount] = useState(false);
 
   const listAccounts = async () => {
     try {
@@ -148,6 +150,35 @@ export default function WalletCreator() {
         <div className={styles.accountInfo}>
           <h3>{walletType} Wallet Created!</h3>
           <p>Address: {account.address}</p>
+          <button 
+            onClick={async () => {
+              try {
+                setIsCreatingSmartAccount(true);
+                const response = await fetch('/api/create-smart-account', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ 
+                    ownerAddress: account.address,
+                    network: evmNetwork
+                  }),
+                });
+                if (!response.ok) throw new Error('Failed to create smart account');
+                const data = await response.json();
+                setSmartAccountAddress(data.smartAccountAddress);
+              } catch (err) {
+                setError(err.message);
+              } finally {
+                setIsCreatingSmartAccount(false);
+              }
+            }}
+            disabled={isCreatingSmartAccount || smartAccountAddress}
+            className={styles.button}
+          >
+            {isCreatingSmartAccount ? 'Creating Smart Account...' : 'Create Smart Account'}
+          </button>
+          {smartAccountAddress && (
+            <p>Smart Account Address: {smartAccountAddress}</p>
+          )}
           {txHash && (
             <p>
               Transaction: <a 
