@@ -3,6 +3,7 @@ import { useState } from 'react';
 import styles from '../styles/WalletCreator.module.css';
 
 type WalletType = 'EVM' | 'SOLANA';
+type EVMNetwork = 'base-sepolia' | 'base-mainnet';
 
 export default function WalletCreator() {
   const [account, setAccount] = useState(null);
@@ -10,6 +11,7 @@ export default function WalletCreator() {
   const [error, setError] = useState('');
   const [txHash, setTxHash] = useState('');
   const [walletType, setWalletType] = useState<WalletType>('EVM');
+  const [evmNetwork, setEvmNetwork] = useState<EVMNetwork>('base-sepolia');
   const [accountName, setAccountName] = useState('');
   const [accounts, setAccounts] = useState([]);
 
@@ -41,7 +43,11 @@ export default function WalletCreator() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ type: walletType, name: accountName }),
+        body: JSON.stringify({ 
+          type: walletType, 
+          name: accountName,
+          network: walletType === 'EVM' ? evmNetwork : undefined 
+        }),
       });
       
       if (!response.ok) {
@@ -65,6 +71,16 @@ export default function WalletCreator() {
       <div className={styles.walletTypeSelector}>
         <label>Select Wallet Type:</label>
         <div className={styles.radioGroup}>
+          {walletType === 'EVM' && (
+            <select 
+              value={evmNetwork}
+              onChange={(e) => setEvmNetwork(e.target.value as EVMNetwork)}
+              className={styles.select}
+            >
+              <option value="base-sepolia">Base Sepolia</option>
+              <option value="base-mainnet">Base Mainnet</option>
+            </select>
+          )}
           <label>
             <input
               type="radio"

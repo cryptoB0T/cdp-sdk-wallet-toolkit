@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const newAccount = await cdp.evm.getOrCreateAccount({ name });
       const { transactionHash } = await cdp.evm.requestFaucet({
         address: newAccount.address,
-        network: "base-sepolia",
+        network: req.body.network || "base-sepolia",
         token: "eth",
       });
 
