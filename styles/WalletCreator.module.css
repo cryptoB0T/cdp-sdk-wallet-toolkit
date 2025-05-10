@@ -133,3 +133,59 @@
   border-radius: 4px;
   background-color: white;
 }
+
+.transferForm {
+  margin-top: 2rem;
+  padding: 2rem;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.transferForm h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.formGroup {
+  margin-bottom: 1.25rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.transferForm .select,
+.transferForm .input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  transition: border-color 0.2s;
+}
+
+.transferForm .select:focus,
+.transferForm .input:focus {
+  outline: none;
+  border-color: #0070f3;
+}
+
+.transferForm .button {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.transferForm .button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}

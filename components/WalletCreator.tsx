@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../styles/WalletCreator.module.css';
 
 type WalletType = 'EVM' | 'SOLANA';
@@ -15,6 +15,45 @@ export default function WalletCreator() {
   const [accounts, setAccounts] = useState([]);
   const [smartAccountAddress, setSmartAccountAddress] = useState('');
   const [isCreatingSmartAccount, setIsCreatingSmartAccount] = useState(false);
+  const [fromAddress, setFromAddress] = useState('');
+  const [toAddress, setToAddress] = useState('');
+  const [transferAmount, setTransferAmount] = useState('');
+  const [isTransferring, setIsTransferring] = useState(false);
+
+  const sendTransaction = async () => {
+    if (!fromAddress || !toAddress || !transferAmount) {
+      setError('Please fill in all transfer details');
+      return;
+    }
+
+    try {
+      setIsTransferring(true);
+      setError('');
+
+      const response = await fetch('/api/send-transaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fromAddress,
+          toAddress,
+          amount: transferAmount
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to send transaction');
+
+      setTxHash(data.transactionHash);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsTransferring(false);
+    }
+  };
+
+  useEffect(() => {
+    listAccounts();
+  }, []);
 
   const listAccounts = async () => {
     try {
@@ -194,6 +233,63 @@ export default function WalletCreator() {
           {smartAccountAddress && (
             <p>Smart Account Address: {smartAccountAddress}</p>
           )}
+        </div>
+      )}
+
+      <div className={styles.transferForm}>
+        <h3>Transfer Funds</h3>
+        <div className={styles.formGroup}>
+          <label>From Address:</label>
+          <select
+            value={fromAddress}
+            onChange={(e) => setFromAddress(e.target.value)}
+            className={styles.select}
+          >
+            <option value="">Select From Address</option>
+            {accounts.map((acc) => (
+              <option key={acc.address} value={acc.address}>
+                {acc.name} ({acc.address})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label>To Address:</label>
+          <select
+            value={toAddress}
+            onChange={(e) => setToAddress(e.target.value)}
+            className={styles.select}
+          >
+            <option value="">Select To Address</option>
+            {accounts.map((acc) => (
+              <option key={acc.address} value={acc.address}>
+                {acc.name} ({acc.address})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label>Amount:</label>
+          <input
+            type="text"
+            value={transferAmount}
+            onChange={(e) => setTransferAmount(e.target.value)}
+            placeholder="Enter amount in ETH"
+            className={styles.input}
+          />
+        </div>
+
+        <button
+          onClick={sendTransaction}
+          disabled={isTransferring || !accounts.length}
+          className={styles.button}
+        >
+          {isTransferring ? 'Transferring...' : 'Send Transaction'}
+        </button>
+      </div>
+
           {txHash && (
             <p>
               Transaction: <a 
@@ -207,8 +303,6 @@ export default function WalletCreator() {
               </a>
             </p>
           )}
-        </div>
-      )}
     </div>
   );
 }
