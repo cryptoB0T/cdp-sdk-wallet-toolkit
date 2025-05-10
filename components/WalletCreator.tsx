@@ -18,10 +18,10 @@ export default function WalletCreator() {
       setError('');
       
       const cdp = new CdpClient({
-  apiKeyId: process.env.CDP_API_KEY_ID,
-  apiKeySecret: process.env.CDP_API_KEY_SECRET,
-  walletSecret: process.env.CDP_WALLET_SECRET,
-});
+        apiKeyId: process.env.NEXT_PUBLIC_CDP_API_KEY_ID,
+        apiKeySecret: process.env.NEXT_PUBLIC_CDP_API_KEY_SECRET,
+        walletSecret: process.env.NEXT_PUBLIC_CDP_WALLET_SECRET,
+      });
       const newAccount = await cdp.evm.createAccount();
       setAccount(newAccount);
 
