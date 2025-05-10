@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from '../styles/WalletCreator.module.css';
+import UserOperationSender from './UserOperationSender';
 
 type WalletType = 'EVM' | 'SOLANA';
 type EVMNetwork = 'base-sepolia' | 'base-mainnet';
@@ -192,7 +193,15 @@ export default function WalletCreator() {
             {isCreatingSmartAccount ? 'Creating Smart Account...' : 'Create Smart Account'}
           </button>
           {smartAccountAddress && (
-            <p>Smart Account Address: {smartAccountAddress}</p>
+            <>
+              <p>Smart Account Address: {smartAccountAddress}</p>
+              {walletType === 'EVM' && (
+                <UserOperationSender 
+                  smartAccountAddress={smartAccountAddress} 
+                  network={evmNetwork} 
+                />
+              )}
+            </>
           )}
           {txHash && (
             <p>
