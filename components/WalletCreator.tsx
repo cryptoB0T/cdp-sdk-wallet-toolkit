@@ -20,6 +20,9 @@ export default function WalletCreator() {
   const [toAddress, setToAddress] = useState('');
   const [transferAmount, setTransferAmount] = useState('');
   const [isTransferring, setIsTransferring] = useState(false);
+  const [smartAccounts, setSmartAccounts] = useState([]);
+  const [loadingSmartAccounts, setLoadingSmartAccounts] = useState(false);
+  const [nextPageToken, setNextPageToken] = useState('');
 
   const sendTransaction = async () => {
     if (!fromAddress || !toAddress || !transferAmount) {
@@ -69,6 +72,39 @@ export default function WalletCreator() {
       setError(errorMessage);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const listSmartAccounts = async (pageToken = '') => {
+    try {
+      setLoadingSmartAccounts(true);
+      setError('');
+      
+      const queryParams = new URLSearchParams();
+      if (pageToken) {
+        queryParams.append('pageToken', pageToken);
+      }
+      
+      const response = await fetch(`/api/list-smart-accounts?${queryParams.toString()}`);
+      if (!response.ok) throw new Error('Failed to list smart accounts');
+      
+      const data = await response.json();
+      
+      if (pageToken) {
+        // Append to existing accounts if using pagination
+        setSmartAccounts(prev => [...prev, ...data.accounts]);
+      } else {
+        // Replace accounts if this is a fresh fetch
+        setSmartAccounts(data.accounts);
+      }
+      
+      setNextPageToken(data.nextPageToken || '');
+    } catch (err) {
+      const errorMessage = err.message || 'Failed to list smart accounts';
+      console.error('List smart accounts error:', err);
+      setError(errorMessage);
+    } finally {
+      setLoadingSmartAccounts(false);
     }
   };
 
@@ -171,6 +207,14 @@ export default function WalletCreator() {
         >
           List Accounts
         </button>
+
+        <button 
+          onClick={() => listSmartAccounts()} 
+          disabled={loadingSmartAccounts}
+          className={styles.button}
+        >
+          {loadingSmartAccounts ? 'Loading...' : 'List Smart Accounts'}
+        </button>
       </div>
 
       {accounts.length > 0 && (
@@ -194,6 +238,29 @@ export default function WalletCreator() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      
+      {smartAccounts.length > 0 && (
+        <div className={styles.accountsList}>
+          <h3>Your Smart Accounts</h3>
+          {smartAccounts.map((acc, index) => (
+            <div key={index} className={styles.accountItem}>
+              <p><strong>Name:</strong> {acc.name}</p>
+              <p><strong>Address:</strong> {acc.address}</p>
+              <p><strong>Owners:</strong> {acc.owners?.join(', ') || 'None'}</p>
+            </div>
+          ))}
+          
+          {nextPageToken && (
+            <button 
+              onClick={() => listSmartAccounts(nextPageToken)} 
+              disabled={loadingSmartAccounts}
+              className={styles.button}
+            >
+              {loadingSmartAccounts ? 'Loading...' : 'Load More Smart Accounts'}
+            </button>
+          )}
         </div>
       )}
 
