@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import styles from '../styles/WalletCreator.module.css';
 
@@ -25,7 +24,9 @@ export default function WalletCreator() {
       const data = await response.json();
       setAccounts(data.accounts);
     } catch (err) {
-      setError(err.message);
+      const errorMessage = err.message || 'Failed to list accounts';
+      console.error('List accounts error:', err);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -39,7 +40,7 @@ export default function WalletCreator() {
     try {
       setLoading(true);
       setError('');
-      
+
       const response = await fetch('/api/create-wallet', {
         method: 'POST',
         headers: {
@@ -51,11 +52,11 @@ export default function WalletCreator() {
           network: walletType === 'EVM' ? evmNetwork : undefined 
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to create wallet');
       }
-      
+
       const data = await response.json();
       setAccount(data.account);
       setTxHash(data.transactionHash);
@@ -69,7 +70,7 @@ export default function WalletCreator() {
   return (
     <div className={styles.container}>
       <h2>Create Wallet</h2>
-      
+
       <div className={styles.walletTypeSelector}>
         <label>Select Wallet Type:</label>
         <div className={styles.radioGroup}>
@@ -122,7 +123,7 @@ export default function WalletCreator() {
         >
           {loading ? 'Creating...' : `Create New ${walletType} Wallet`}
         </button>
-        
+
         <button 
           onClick={listAccounts} 
           disabled={loading}

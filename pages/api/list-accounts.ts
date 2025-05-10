@@ -58,7 +58,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else {
       return res.status(400).json({ error: 'Invalid wallet type' });
     }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (error: any) {
+    console.error('List accounts error:', error);
+    res.status(500).json({ 
+      error: 'Failed to list accounts',
+      details: error.message || 'Unknown error occurred'
+    });
   }
 }
