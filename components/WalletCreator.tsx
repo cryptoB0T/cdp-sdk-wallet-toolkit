@@ -154,6 +154,7 @@ export default function WalletCreator() {
             onClick={async () => {
               try {
                 setIsCreatingSmartAccount(true);
+                setError('');
                 const response = await fetch('/api/create-smart-account', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -162,11 +163,12 @@ export default function WalletCreator() {
                     network: evmNetwork
                   }),
                 });
-                if (!response.ok) throw new Error('Failed to create smart account');
                 const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to create smart account');
                 setSmartAccountAddress(data.smartAccountAddress);
               } catch (err) {
                 setError(err.message);
+                console.error('Smart account creation failed:', err);
               } finally {
                 setIsCreatingSmartAccount(false);
               }
