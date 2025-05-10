@@ -51,6 +51,10 @@ export default function WalletCreator() {
     }
   };
 
+  useEffect(() => {
+    listAccounts();
+  }, []);
+
   const listAccounts = async () => {
     try {
       setLoading(true);
@@ -229,51 +233,62 @@ export default function WalletCreator() {
           {smartAccountAddress && (
             <p>Smart Account Address: {smartAccountAddress}</p>
           )}
+        </div>
+      )}
 
-         <div>
-            <h3>Transfer Funds</h3>
-            <select
-              value={fromAddress}
-              onChange={(e) => setFromAddress(e.target.value)}
-              className={styles.select}
-            >
-              <option value="">Select From Address</option>
-              {accounts.map((acc) => (
-                <option key={acc.address} value={acc.address}>
-                  {acc.name} ({acc.address})
-                </option>
-              ))}
-            </select>
+      <div className={styles.transferForm}>
+        <h3>Transfer Funds</h3>
+        <div className={styles.formGroup}>
+          <label>From Address:</label>
+          <select
+            value={fromAddress}
+            onChange={(e) => setFromAddress(e.target.value)}
+            className={styles.select}
+          >
+            <option value="">Select From Address</option>
+            {accounts.map((acc) => (
+              <option key={acc.address} value={acc.address}>
+                {acc.name} ({acc.address})
+              </option>
+            ))}
+          </select>
+        </div>
 
-            <select
-              value={toAddress}
-              onChange={(e) => setToAddress(e.target.value)}
-              className={styles.select}
-            >
-              <option value="">Select To Address</option>
-              {accounts.map((acc) => (
-                <option key={acc.address} value={acc.address}>
-                  {acc.name} ({acc.address})
-                </option>
-              ))}
-            </select>
+        <div className={styles.formGroup}>
+          <label>To Address:</label>
+          <select
+            value={toAddress}
+            onChange={(e) => setToAddress(e.target.value)}
+            className={styles.select}
+          >
+            <option value="">Select To Address</option>
+            {accounts.map((acc) => (
+              <option key={acc.address} value={acc.address}>
+                {acc.name} ({acc.address})
+              </option>
+            ))}
+          </select>
+        </div>
 
-            <input
-              type="text"
-              value={transferAmount}
-              onChange={(e) => setTransferAmount(e.target.value)}
-              placeholder="Enter amount to transfer"
-              className={styles.input}
-            />
+        <div className={styles.formGroup}>
+          <label>Amount:</label>
+          <input
+            type="text"
+            value={transferAmount}
+            onChange={(e) => setTransferAmount(e.target.value)}
+            placeholder="Enter amount in ETH"
+            className={styles.input}
+          />
+        </div>
 
-            <button
-              onClick={sendTransaction}
-              disabled={isTransferring}
-              className={styles.button}
-            >
-              {isTransferring ? 'Transferring...' : 'Send Transaction'}
-            </button>
-          </div>
+        <button
+          onClick={sendTransaction}
+          disabled={isTransferring || !accounts.length}
+          className={styles.button}
+        >
+          {isTransferring ? 'Transferring...' : 'Send Transaction'}
+        </button>
+      </div>
 
           {txHash && (
             <p>
