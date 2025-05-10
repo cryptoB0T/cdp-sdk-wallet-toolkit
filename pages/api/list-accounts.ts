@@ -34,20 +34,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             ? balanceResponse 
             : (balanceResponse?.tokens || []);
           
-          // Add native token balance if present
+          // Initialize balances array
           const balances = [];
-          if (balanceResponse?.nativeTokenBalance) {
+          
+          // Add native token balance if present
+          if (balanceResponse?.nativeToken?.amount) {
             balances.push({
               currency: 'ETH',
-              amount: balanceResponse.nativeTokenBalance.toString()
+              amount: balanceResponse.nativeToken.amount.toString()
             });
           }
           
           // Add other token balances
-          balances.push(...balanceArray.map(balance => ({
-            currency: balance.currency || balance.symbol || 'Unknown',
-            amount: (balance.amount || balance.balance || '0').toString()
-          })));
+          if (balanceResponse?.tokens) {
+            balances.push(...balanceResponse.tokens.map(balance => ({
+              currency: balance.currency || balance.symbol || 'Unknown',
+              amount: (balance.amount || '0').toString()
+            })));
+          }
           
           return {
             ...account,
