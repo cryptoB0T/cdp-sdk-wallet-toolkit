@@ -50,14 +50,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         throw new Error('Failed to create smart account - no response from CDP');
       }
 
-    res.status(200).json({ 
-      smartAccountAddress: smartAccount.address,
-      network: network || 'base-sepolia'
-    });
+      res.status(200).json({ 
+        smartAccountAddress: smartAccount.address,
+        network: network || 'base-sepolia'
+      });
+    } catch (error) {
+      console.error('Smart Account Creation Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to create smart account. Please try again.',
+        details: error.message 
+      });
+    }
   } catch (error) {
-    console.error('Smart Account Creation Error:', error);
+    console.error('CDP Client Error:', error);
     res.status(500).json({ 
-      error: 'Failed to create smart account. Please try again.',
+      error: 'Failed to initialize CDP client',
       details: error.message 
     });
   }
