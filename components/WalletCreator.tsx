@@ -303,8 +303,6 @@ export default function WalletCreator() {
               </a>
             </p>
           )}
-        </div>
-      )}
     </div>
   );
 }
