@@ -113,6 +113,17 @@
   word-break: break-all;
 }
 
+.balances {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+}
+
+.balances p {
+  margin: 0.15rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
 .select {
   width: 100%;
   padding: 0.5rem;
