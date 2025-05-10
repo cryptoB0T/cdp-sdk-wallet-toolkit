@@ -17,37 +17,21 @@ export default function WalletCreator() {
       setLoading(true);
       setError('');
       
-      const cdp = new CdpClient({
-        apiKeyId: process.env.NEXT_PUBLIC_CDP_API_KEY_ID,
-        apiKeySecret: process.env.NEXT_PUBLIC_CDP_API_KEY_SECRET,
-        walletSecret: process.env.NEXT_PUBLIC_CDP_WALLET_SECRET,
-      });
-      const newAccount = await cdp.evm.createAccount();
-      setAccount(newAccount);
-
-      const walletClient = createWalletClient({
-        account: toAccount(newAccount),
-        chain: baseSepolia,
-        transport: http(),
-      });
-
-      const publicClient = createPublicClient({
-        chain: baseSepolia,
-        transport: http(),
-      });
-
-      // Request testnet ETH
-      const { transactionHash } = await cdp.evm.requestFaucet({
-        address: newAccount.address,
-        network: "base-sepolia",
-        token: "eth",
-      });
-
-      await publicClient.waitForTransactionReceipt({
-        hash: transactionHash,
-      });
-
-      setTxHash(transactionHash);
+      try {
+        const response = await fetch('/api/create-wallet', {
+          method: 'POST',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to create wallet');
+        }
+        
+        const data = await response.json();
+        setAccount(data.account);
+        setTxHash(data.transactionHash);
+      } catch (err) {
+        setError(err.message);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
