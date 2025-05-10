@@ -24,10 +24,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Fetch balances for each account
       const accountsWithBalances = await Promise.all(
         accounts.map(async (account) => {
+          console.log('Fetching balances for address:', account.address);
           const balanceResponse = await cdp.evm.listTokenBalances({
             address: account.address,
             network: 'base-sepolia'
           });
+          
+          console.log('Balance response:', JSON.stringify(balanceResponse, null, 2));
           
           // Handle both the array and object response formats
           const balanceArray = Array.isArray(balanceResponse) 
@@ -38,10 +41,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const balances = [];
           
           // Add native token balance if present
-          if (balanceResponse?.nativeToken?.amount) {
+          if (balanceResponse?.nativeToken?.balance) {  // Changed from amount to balance
+            console.log('Found native token balance:', balanceResponse.nativeToken.balance);
             balances.push({
               currency: 'ETH',
-              amount: balanceResponse.nativeToken.amount.toString()
+              amount: balanceResponse.nativeToken.balance.toString()
             });
           }
           
