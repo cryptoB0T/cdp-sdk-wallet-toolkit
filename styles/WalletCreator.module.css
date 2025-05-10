@@ -133,3 +133,21 @@
   border-radius: 4px;
   background-color: white;
 }
+
+.transferForm {
+  margin-top: 2rem;
+  padding: 1rem;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  background: white;
+}
+
+.transferForm h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.transferForm .select,
+.transferForm .input {
+  margin-bottom: 1rem;
+}

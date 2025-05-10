@@ -15,6 +15,41 @@ export default function WalletCreator() {
   const [accounts, setAccounts] = useState([]);
   const [smartAccountAddress, setSmartAccountAddress] = useState('');
   const [isCreatingSmartAccount, setIsCreatingSmartAccount] = useState(false);
+  const [fromAddress, setFromAddress] = useState('');
+  const [toAddress, setToAddress] = useState('');
+  const [transferAmount, setTransferAmount] = useState('');
+  const [isTransferring, setIsTransferring] = useState(false);
+
+  const sendTransaction = async () => {
+    if (!fromAddress || !toAddress || !transferAmount) {
+      setError('Please fill in all transfer details');
+      return;
+    }
+
+    try {
+      setIsTransferring(true);
+      setError('');
+
+      const response = await fetch('/api/send-transaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fromAddress,
+          toAddress,
+          amount: transferAmount
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to send transaction');
+
+      setTxHash(data.transactionHash);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsTransferring(false);
+    }
+  };
 
   const listAccounts = async () => {
     try {
@@ -194,6 +229,52 @@ export default function WalletCreator() {
           {smartAccountAddress && (
             <p>Smart Account Address: {smartAccountAddress}</p>
           )}
+
+         <div>
+            <h3>Transfer Funds</h3>
+            <select
+              value={fromAddress}
+              onChange={(e) => setFromAddress(e.target.value)}
+              className={styles.select}
+            >
+              <option value="">Select From Address</option>
+              {accounts.map((acc) => (
+                <option key={acc.address} value={acc.address}>
+                  {acc.name} ({acc.address})
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={toAddress}
+              onChange={(e) => setToAddress(e.target.value)}
+              className={styles.select}
+            >
+              <option value="">Select To Address</option>
+              {accounts.map((acc) => (
+                <option key={acc.address} value={acc.address}>
+                  {acc.name} ({acc.address})
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="text"
+              value={transferAmount}
+              onChange={(e) => setTransferAmount(e.target.value)}
+              placeholder="Enter amount to transfer"
+              className={styles.input}
+            />
+
+            <button
+              onClick={sendTransaction}
+              disabled={isTransferring}
+              className={styles.button}
+            >
+              {isTransferring ? 'Transferring...' : 'Send Transaction'}
+            </button>
+          </div>
+
           {txHash && (
             <p>
               Transaction: <a 
