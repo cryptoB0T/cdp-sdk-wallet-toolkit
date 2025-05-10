@@ -1,4 +1,3 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { CdpClient } from "@coinbase/cdp-sdk";
 
@@ -20,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (type === 'EVM') {
       const response = await cdp.evm.listAccounts();
       accounts = response.accounts;
-      
+
       // Fetch balances for each account
       const accountsWithBalances = await Promise.all(
         accounts.map(async (account) => {
@@ -29,25 +28,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             address: account.address,
             network: 'base-sepolia'
           });
-          
-          // Custom replacer to handle BigInt
-          const replacer = (key, value) => 
+
+          // Custom replacer for BigInt serialization
+          const replacer = (key, value) =>
             typeof value === 'bigint' ? value.toString() : value;
-            
+
           console.log('Balance response:', JSON.stringify(balanceResponse, replacer, 2));
-          
+
           // Initialize balances array
           const balances = [];
-          
+
           // Add native token balance if present
           if (balanceResponse?.nativeToken?.value) {
-            console.log('Found native token balance:', balanceResponse.nativeToken.value.toString());
+            const nativeBalance = balanceResponse.nativeToken.value.toString();
+            console.log('Found native token balance:', nativeBalance);
             balances.push({
               currency: 'ETH',
-              amount: balanceResponse.nativeToken.value.toString()
+              amount: nativeBalance
             });
           }
-          
+
           // Add token balances if present
           if (balanceResponse?.tokens) {
             balances.push(...balanceResponse.tokens.map(token => ({
@@ -55,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               amount: token.value?.toString() || '0'
             })));
           }
-          
+
           // Add other token balances
           if (balanceResponse?.tokens) {
             balances.push(...balanceResponse.tokens.map(balance => ({
@@ -63,19 +63,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               amount: (balance.amount || '0').toString()
             })));
           }
-          
+
           return {
             ...account,
             balances
           };
         })
       );
-      
+
       res.status(200).json({ accounts: accountsWithBalances });
     } else if (type === 'SOLANA') {
       const response = await cdp.solana.listAccounts();
       accounts = response.accounts;
-      
+
       // Fetch balances for each account
       const accountsWithBalances = await Promise.all(
         accounts.map(async (account) => {
@@ -89,7 +89,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           };
         })
       );
-      
+
       res.status(200).json({ accounts: accountsWithBalances });
     } else {
       return res.status(400).json({ error: 'Invalid wallet type' });
