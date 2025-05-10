@@ -1,21 +1,37 @@
+
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
+import Link from "next/link";
 import styles from "../styles/Home.module.css";
-import WalletCreator from "../components/WalletCreator";
 
 const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Wallet Creator</title>
-        <meta name="description" content="Create Web3 Wallets" />
+        <title>Web3 Account Manager</title>
+        <meta name="description" content="Web3 Account Management" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>Web3 Wallet Creator</h1>
-        <WalletCreator />
+        <h1 className={styles.title}>Web3 Account Manager</h1>
+        
+        <nav className={styles.nav}>
+          <Link href="/create-account" className={styles.card}>
+            <h2>Create Account &rarr;</h2>
+            <p>Create a new Web3 account (EVM or Solana)</p>
+          </Link>
+
+          <Link href="/list-accounts" className={styles.card}>
+            <h2>List Accounts &rarr;</h2>
+            <p>View all your accounts and their balances</p>
+          </Link>
+
+          <Link href="/transfer-funds" className={styles.card}>
+            <h2>Transfer Funds &rarr;</h2>
+            <p>Send funds between your accounts</p>
+          </Link>
+        </nav>
       </main>
     </div>
   );
