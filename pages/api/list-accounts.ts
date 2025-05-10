@@ -30,23 +30,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             network: 'base-sepolia'
           });
           
-          console.log('Balance response:', JSON.stringify(balanceResponse, null, 2));
-          
-          // Handle both the array and object response formats
-          const balanceArray = Array.isArray(balanceResponse) 
-            ? balanceResponse 
-            : (balanceResponse?.tokens || []);
+          // Custom replacer to handle BigInt
+          const replacer = (key, value) => 
+            typeof value === 'bigint' ? value.toString() : value;
+            
+          console.log('Balance response:', JSON.stringify(balanceResponse, replacer, 2));
           
           // Initialize balances array
           const balances = [];
           
           // Add native token balance if present
-          if (balanceResponse?.nativeToken?.balance) {  // Changed from amount to balance
-            console.log('Found native token balance:', balanceResponse.nativeToken.balance);
+          if (balanceResponse?.nativeToken?.value) {
+            console.log('Found native token balance:', balanceResponse.nativeToken.value.toString());
             balances.push({
               currency: 'ETH',
-              amount: balanceResponse.nativeToken.balance.toString()
+              amount: balanceResponse.nativeToken.value.toString()
             });
+          }
+          
+          // Add token balances if present
+          if (balanceResponse?.tokens) {
+            balances.push(...balanceResponse.tokens.map(token => ({
+              currency: token.symbol || 'Unknown',
+              amount: token.value?.toString() || '0'
+            })));
           }
           
           // Add other token balances
