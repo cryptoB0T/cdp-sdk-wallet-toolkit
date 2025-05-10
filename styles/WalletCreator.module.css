@@ -28,6 +28,28 @@
   cursor: not-allowed;
 }
 
+.walletTypeSelector {
+  margin-bottom: 1.5rem;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.radioGroup label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.radioGroup input[type="radio"] {
+  cursor: pointer;
+}
+
 .error {
   color: #dc3545;
   margin-top: 1rem;

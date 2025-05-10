@@ -7,6 +7,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const { type } = req.body;
+
   try {
     const cdp = new CdpClient({
       apiKeyId: process.env.CDP_API_KEY_ID,
@@ -14,14 +16,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       walletSecret: process.env.CDP_WALLET_SECRET,
     });
 
-    const newAccount = await cdp.evm.createAccount();
-    const { transactionHash } = await cdp.evm.requestFaucet({
-      address: newAccount.address,
-      network: "base-sepolia",
-      token: "eth",
-    });
+    if (type === 'EVM') {
+      const newAccount = await cdp.evm.createAccount();
+      const { transactionHash } = await cdp.evm.requestFaucet({
+        address: newAccount.address,
+        network: "base-sepolia",
+        token: "eth",
+      });
 
-    res.status(200).json({ account: newAccount, transactionHash });
+      res.status(200).json({ account: newAccount, transactionHash });
+    } else if (type === 'SOLANA') {
+      const newAccount = await cdp.solana.createAccount();
+      const { transactionHash } = await cdp.solana.requestFaucet({
+        address: newAccount.address,
+        network: "solana-devnet",
+        token: "sol",
+      });
+
+      res.status(200).json({ account: newAccount, transactionHash });
+    } else {
+      res.status(400).json({ error: 'Invalid wallet type' });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
