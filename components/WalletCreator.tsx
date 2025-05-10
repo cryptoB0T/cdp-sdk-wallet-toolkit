@@ -83,11 +83,13 @@ export default function WalletCreator() {
           {txHash && (
             <p>
               Transaction: <a 
-                href={`https://sepolia.basescan.org/tx/${txHash}`}
+                href={walletType === 'EVM' 
+                  ? `https://sepolia.basescan.org/tx/${txHash}`
+                  : `https://solscan.io/tx/${txHash}?cluster=devnet`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                View on BaseScan
+                View on {walletType === 'EVM' ? 'BaseScan' : 'Solscan'}
               </a>
             </p>
           )}
