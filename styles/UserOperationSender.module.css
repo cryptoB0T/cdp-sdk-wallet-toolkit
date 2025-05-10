@@ -1,0 +1,121 @@
+.container {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.inputGroup {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.button {
+  background-color: #0052ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #0039b3;
+}
+
+.button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #dc3545;
+  margin-top: 10px;
+}
+
+.success {
+  color: #28a745;
+  margin-top: 10px;
+}
+
+.transactionInfo {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #e9f7ef;
+  border-radius: 4px;
+  border-left: 4px solid #28a745;
+}
+
+.link {
+  color: #0052ff;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.exampleSection {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f0f5ff;
+  border-radius: 4px;
+  border-left: 4px solid #0052ff;
+}
+
+.example {
+  margin-top: 10px;
+}
+
+.code {
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 14px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  margin: 10px 0;
+}
+
+.exampleButton {
+  background-color: #0052ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.exampleButton:hover {
+  background-color: #0039b3;
+}
+
+.note {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+  margin: 5px 0;
+}
