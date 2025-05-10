@@ -28,9 +28,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             address: account.address,
             network: 'base-sepolia'
           });
+          
+          // Convert BigInt values to strings
+          const serializedBalances = balances.map(balance => ({
+            ...balance,
+            amount: balance.amount.toString()
+          }));
+          
           return {
             ...account,
-            balances
+            balances: serializedBalances
           };
         })
       );
