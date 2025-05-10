@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { type } = req.body;
+  const { type, name } = req.body;
 
   try {
     const cdp = new CdpClient({
@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     if (type === 'EVM') {
-      const newAccount = await cdp.evm.createAccount();
+      const newAccount = await cdp.evm.getOrCreateAccount({ name });
       const { transactionHash } = await cdp.evm.requestFaucet({
         address: newAccount.address,
         network: "base-sepolia",
@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       res.status(200).json({ account: newAccount, transactionHash });
     } else if (type === 'SOLANA') {
-      const newAccount = await cdp.solana.createAccount();
+      const newAccount = await cdp.solana.getOrCreateAccount({ name });
       const { transactionHash } = await cdp.solana.requestFaucet({
         address: newAccount.address,
         network: "solana-devnet",

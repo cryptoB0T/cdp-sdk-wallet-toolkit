@@ -10,8 +10,28 @@ export default function WalletCreator() {
   const [error, setError] = useState('');
   const [txHash, setTxHash] = useState('');
   const [walletType, setWalletType] = useState<WalletType>('EVM');
+  const [accountName, setAccountName] = useState('');
+  const [accounts, setAccounts] = useState([]);
+
+  const listAccounts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/list-accounts?type=${walletType}`);
+      if (!response.ok) throw new Error('Failed to list accounts');
+      const data = await response.json();
+      setAccounts(data.accounts);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const createWallet = async () => {
+    if (!accountName.trim()) {
+      setError('Please enter an account name');
+      return;
+    }
     try {
       setLoading(true);
       setError('');
@@ -21,7 +41,7 @@ export default function WalletCreator() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ type: walletType }),
+        body: JSON.stringify({ type: walletType, name: accountName }),
       });
       
       if (!response.ok) {
@@ -66,13 +86,45 @@ export default function WalletCreator() {
         </div>
       </div>
 
-      <button 
-        onClick={createWallet} 
-        disabled={loading}
-        className={styles.button}
-      >
-        {loading ? 'Creating...' : `Create New ${walletType} Wallet`}
-      </button>
+      <div className={styles.inputGroup}>
+        <input
+          type="text"
+          value={accountName}
+          onChange={(e) => setAccountName(e.target.value)}
+          placeholder="Enter account name"
+          className={styles.input}
+        />
+      </div>
+
+      <div className={styles.buttonGroup}>
+        <button 
+          onClick={createWallet} 
+          disabled={loading}
+          className={styles.button}
+        >
+          {loading ? 'Creating...' : `Create New ${walletType} Wallet`}
+        </button>
+        
+        <button 
+          onClick={listAccounts} 
+          disabled={loading}
+          className={styles.button}
+        >
+          List Accounts
+        </button>
+      </div>
+
+      {accounts.length > 0 && (
+        <div className={styles.accountsList}>
+          <h3>Your Accounts</h3>
+          {accounts.map((acc, index) => (
+            <div key={index} className={styles.accountItem}>
+              <p><strong>Name:</strong> {acc.name}</p>
+              <p><strong>Address:</strong> {acc.address}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {error && <p className={styles.error}>{error}</p>}
 
