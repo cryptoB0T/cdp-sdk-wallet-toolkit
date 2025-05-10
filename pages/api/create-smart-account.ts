@@ -26,20 +26,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       walletSecret: process.env.CDP_WALLET_SECRET,
     });
 
+    console.log('Fetching owner account for address:', ownerAddress);
     // First validate the owner account exists
     const ownerAccount = await cdp.evm.getAccount({ address: ownerAddress });
+    console.log('Owner account response:', ownerAccount);
+    
     if (!ownerAccount) {
+      console.log('Owner account not found');
       return res.status(404).json({ error: 'Owner account not found' });
     }
 
+    console.log('Creating smart account for owner:', ownerAccount.address);
     // Create smart account with specific network config
     const smartAccount = await cdp.evm.createSmartAccount({
-      ownerAddress: ownerAccount.address,
+      ownerAddress: ownerAddress, // Use the original address directly
       network: network || 'base-sepolia',
       config: {
         salt: Date.now().toString(),
       }
     });
+    console.log('Smart account response:', smartAccount);
 
     if (!smartAccount) {
       throw new Error('Failed to create smart account - no response from CDP');
