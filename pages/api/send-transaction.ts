@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       walletSecret: process.env.CDP_WALLET_SECRET,
     });
 
-    const account = await cdp.evm.getAccount(fromAddress);
+    const account = await cdp.evm.getAccount({ address: fromAddress });
     
     const walletClient = createWalletClient({
       account: toAccount(account),
