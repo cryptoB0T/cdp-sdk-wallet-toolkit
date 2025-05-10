@@ -29,10 +29,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             network: 'base-sepolia'
           });
           
+          // Ensure balances is an array and handle the response structure
+          const balanceArray = Array.isArray(balances) ? balances : (balances?.tokens || []);
+          
           // Convert BigInt values to strings
-          const serializedBalances = balances.map(balance => ({
+          const serializedBalances = balanceArray.map(balance => ({
             ...balance,
-            amount: balance.amount.toString()
+            amount: balance.amount?.toString() || '0'
           }));
           
           return {
