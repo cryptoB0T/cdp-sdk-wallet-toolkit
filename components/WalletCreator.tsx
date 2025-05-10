@@ -140,18 +140,18 @@ export default function WalletCreator() {
             <div key={index} className={styles.accountItem}>
               <p><strong>Name:</strong> {acc.name}</p>
               <p><strong>Address:</strong> {acc.address}</p>
-              {acc.balances && acc.balances.length > 0 ? (
-                <div className={styles.balances}>
-                  <p><strong>Balances:</strong></p>
-                  {acc.balances.map((balance, idx) => (
+              <div className={styles.balances}>
+                <p><strong>Balances:</strong></p>
+                {acc.balances && acc.balances.length > 0 ? (
+                  acc.balances.map((balance, idx) => (
                     <p key={idx}>
                       {balance.amount} {balance.currency}
                     </p>
-                  ))}
-                </div>
-              ) : (
-                <p><strong>Balances:</strong> No tokens found</p>
-              )}
+                  ))
+                ) : (
+                  <p className={styles.noTokens}>No tokens found</p>
+                )}
+              </div>
             </div>
           ))}
         </div>

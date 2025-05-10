@@ -24,19 +24,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Fetch balances for each account
       const accountsWithBalances = await Promise.all(
         accounts.map(async (account) => {
-          const balances = await cdp.evm.listTokenBalances({
+          const balanceResponse = await cdp.evm.listTokenBalances({
             address: account.address,
             network: 'base-sepolia'
           });
           
-          // Ensure balances is an array and handle the response structure
-          const balanceArray = Array.isArray(balances) ? balances : (balances?.tokens || []);
+          // Handle both the array and object response formats
+          const balanceArray = Array.isArray(balanceResponse) 
+            ? balanceResponse 
+            : (balanceResponse?.tokens || []);
           
-          // Convert BigInt values to strings
-          const serializedBalances = balanceArray.map(balance => ({
-            ...balance,
-            amount: balance.amount?.toString() || '0'
-          }));
+          // Add native token balance if present
+          const balances = [];
+          if (balanceResponse?.nativeTokenBalance) {
+            balances.push({
+              currency: 'ETH',
+              amount: balanceResponse.nativeTokenBalance.toString()
+            });
+          }
+          
+          // Add other token balances
+          balances.push(...balanceArray.map(balance => ({
+            currency: balance.currency || balance.symbol || 'Unknown',
+            amount: (balance.amount || balance.balance || '0').toString()
+          })));
           
           return {
             ...account,
