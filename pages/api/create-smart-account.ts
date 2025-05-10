@@ -9,6 +9,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { ownerAddress, network } = req.body;
 
+  if (!ownerAddress) {
+    return res.status(400).json({ error: 'Owner address is required' });
+  }
+
   if (!process.env.CDP_API_KEY_ID || !process.env.CDP_API_KEY_SECRET || !process.env.CDP_WALLET_SECRET) {
     return res.status(500).json({ 
       error: 'Missing CDP configuration. Please check environment variables.' 
@@ -20,25 +24,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       apiKeyId: process.env.CDP_API_KEY_ID,
       apiKeySecret: process.env.CDP_API_KEY_SECRET,
       walletSecret: process.env.CDP_WALLET_SECRET,
-      network: network // Add network configuration
     });
 
+    // First validate the owner account exists
+    const ownerAccount = await cdp.evm.getAccount({ address: ownerAddress });
+    if (!ownerAccount) {
+      return res.status(404).json({ error: 'Owner account not found' });
+    }
+
+    // Create smart account with specific network config
     const smartAccount = await cdp.evm.createSmartAccount({
-      ownerAddress,
-      network,
+      ownerAddress: ownerAccount.address,
+      network: network || 'base-sepolia',
       config: {
-        salt: Date.now().toString(), // Add unique salt for deterministic deployment
+        salt: Date.now().toString(),
       }
     });
 
+    if (!smartAccount) {
+      throw new Error('Failed to create smart account - no response from CDP');
+    }
+
     res.status(200).json({ 
       smartAccountAddress: smartAccount.address,
-      network
+      network: network || 'base-sepolia'
     });
   } catch (error) {
     console.error('Smart Account Creation Error:', error);
     res.status(500).json({ 
-      error: 'Failed to create smart account. Please check CDP configuration and network settings.',
+      error: 'Failed to create smart account. Please try again.',
       details: error.message 
     });
   }
