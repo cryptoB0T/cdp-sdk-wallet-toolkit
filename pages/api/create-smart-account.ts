@@ -36,20 +36,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: 'Owner account not found' });
     }
 
-    console.log('Creating smart account for owner:', ownerAccount.address);
-    // Create smart account with specific network config
-    const smartAccount = await cdp.evm.createSmartAccount({
-      ownerAddress: ownerAddress, // Use the original address directly
-      network: network || 'base-sepolia',
-      config: {
-        salt: Date.now().toString(),
-      }
-    });
-    console.log('Smart account response:', smartAccount);
+    console.log('Creating smart account for owner:', ownerAddress);
+    try {
+      // Create smart account with specific network config
+      const smartAccount = await cdp.evm.createAccount({
+        name: `smart-${Date.now()}`,
+        type: 'smart'
+      });
+      
+      console.log('Smart account response:', smartAccount);
 
-    if (!smartAccount) {
-      throw new Error('Failed to create smart account - no response from CDP');
-    }
+      if (!smartAccount) {
+        throw new Error('Failed to create smart account - no response from CDP');
+      }
 
     res.status(200).json({ 
       smartAccountAddress: smartAccount.address,
