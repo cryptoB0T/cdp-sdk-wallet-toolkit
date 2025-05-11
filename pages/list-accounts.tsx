@@ -6,8 +6,20 @@ import { useState, useEffect, useCallback } from 'react';
 
 const ListAccounts: NextPage = () => {
   const [accounts, setAccounts] = useState([]);
+  const [smartAccounts, setSmartAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const fetchSmartAccounts = async () => {
+    try {
+      const response = await fetch('/api/list-smart-accounts');
+      if (!response.ok) throw new Error('Failed to fetch smart accounts');
+      const data = await response.json();
+      setSmartAccounts(data.accounts || []);
+    } catch (err) {
+      console.error('List smart accounts error:', err);
+    }
+  };
   const [walletType, setWalletType] = useState<'EVM' | 'SOLANA'>('EVM');
 
   const listAccounts = useCallback(async () => {
@@ -28,6 +40,7 @@ const ListAccounts: NextPage = () => {
 
   useEffect(() => {
     listAccounts();
+    fetchSmartAccounts();
   }, [listAccounts]);
 
   return (
@@ -89,9 +102,46 @@ const ListAccounts: NextPage = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold">{acc.name}</h3>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/create-smart-account', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                              ownerAddress: acc.address,
+                              network: 'base-sepolia'
+                            }),
+                          });
+                          const data = await response.json();
+                          if (!response.ok) throw new Error(data.error || 'Failed to create smart account');
+                          alert(`Smart account created! Address: ${data.smartAccountAddress}`);
+                        } catch (err: any) {
+                          alert('Failed to create smart account: ' + err.message);
+                        }
+                      }}
+                      className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                    >
+                      Create Smart Account
+                    </button>
                   </div>
                   <p className="text-sm text-muted-foreground break-all"><span className="font-medium">Address:</span> {acc.address}</p>
                   
+                  {smartAccounts.filter(sa => sa.owners[0]?.address === acc.address).length > 0 && (
+                    <div className="mt-4 border-t pt-4">
+                      <h4 className="font-medium mb-2">Smart Accounts:</h4>
+                      <div className="space-y-2">
+                        {smartAccounts
+                          .filter(sa => sa.owners[0]?.address === acc.address)
+                          .map((sa, idx) => (
+                            <div key={idx} className="text-sm text-muted-foreground">
+                              <span className="font-medium">Address:</span> {sa.address}
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </div>
+                  )}
                   <div className="mt-4">
                     <h4 className="font-medium mb-2">Balances:</h4>
                     {acc.balances && acc.balances.length > 0 ? (
