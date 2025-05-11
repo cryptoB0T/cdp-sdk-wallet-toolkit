@@ -5,15 +5,17 @@ export function getApiKeys() {
     if (savedKeys) {
       const keys = JSON.parse(savedKeys);
       return {
-        apiKey: keys.COINBASE_API_KEY,
-        apiSecret: keys.COINBASE_API_SECRET
+        apiKeyId: keys.CDP_API_KEY_ID,
+        apiKeySecret: keys.CDP_API_KEY_SECRET,
+        walletSecret: keys.CDP_WALLET_SECRET
       };
     }
   }
   
   // Fallback to environment variables
   return {
-    apiKey: process.env.COINBASE_API_KEY,
-    apiSecret: process.env.COINBASE_API_SECRET
+    apiKeyId: process.env.CDP_API_KEY_ID,
+    apiKeySecret: process.env.CDP_API_KEY_SECRET,
+    walletSecret: process.env.CDP_WALLET_SECRET
   };
 }

@@ -10,8 +10,9 @@ import {
 } from "./dropdown-menu"
 
 interface ApiKeys {
-  COINBASE_API_KEY?: string;
-  COINBASE_API_SECRET?: string;
+  CDP_API_KEY_ID?: string;
+  CDP_API_KEY_SECRET?: string;
+  CDP_WALLET_SECRET?: string;
 }
 
 export function ApiKeysDialog() {
@@ -40,23 +41,33 @@ export function ApiKeysDialog() {
       <DropdownMenuContent align="end" className="w-[300px] p-4">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm mb-1">API Key</label>
+            <label className="block text-sm mb-1">CDP API Key ID</label>
             <input
               type="password"
               className="w-full p-2 border rounded"
-              value={apiKeys.COINBASE_API_KEY || ''}
-              onChange={(e) => setApiKeys(prev => ({ ...prev, COINBASE_API_KEY: e.target.value }))}
-              placeholder="Enter API Key"
+              value={apiKeys.CDP_API_KEY_ID || ''}
+              onChange={(e) => setApiKeys(prev => ({ ...prev, CDP_API_KEY_ID: e.target.value }))}
+              placeholder="Enter CDP API Key ID"
             />
           </div>
           <div>
-            <label className="block text-sm mb-1">API Secret</label>
+            <label className="block text-sm mb-1">CDP API Key Secret</label>
             <input
               type="password"
               className="w-full p-2 border rounded"
-              value={apiKeys.COINBASE_API_SECRET || ''}
-              onChange={(e) => setApiKeys(prev => ({ ...prev, COINBASE_API_SECRET: e.target.value }))}
-              placeholder="Enter API Secret"
+              value={apiKeys.CDP_API_KEY_SECRET || ''}
+              onChange={(e) => setApiKeys(prev => ({ ...prev, CDP_API_KEY_SECRET: e.target.value }))}
+              placeholder="Enter CDP API Key Secret"
+            />
+          </div>
+          <div>
+            <label className="block text-sm mb-1">CDP Wallet Secret</label>
+            <input
+              type="password"
+              className="w-full p-2 border rounded"
+              value={apiKeys.CDP_WALLET_SECRET || ''}
+              onChange={(e) => setApiKeys(prev => ({ ...prev, CDP_WALLET_SECRET: e.target.value }))}
+              placeholder="Enter CDP Wallet Secret"
             />
           </div>
           <Button className="w-full" onClick={handleSaveKeys}>
