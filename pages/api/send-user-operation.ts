@@ -74,7 +74,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log('Fetching smart account:', smartAccountAddress);
     // Get the smart account
-    const account = await cdp.evm.getAccount({ address: smartAccountAddress });
+    let account;
+    try {
+      account = await cdp.evm.getAccount({ address: smartAccountAddress });
+      console.log('Account retrieved successfully:', account.address);
+    } catch (error) {
+      console.error('Error retrieving account:', error);
+      return res.status(404).json({ 
+        error: 'Smart account not found', 
+        details: error.message,
+        tip: 'Make sure you have valid CDP API keys configured and the smart account address is correct.'
+      });
+    }
     
     if (!account) {
       console.log('Smart account not found');
