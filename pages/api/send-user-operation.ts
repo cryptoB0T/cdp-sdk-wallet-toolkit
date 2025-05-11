@@ -60,12 +60,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       error: 'Missing CDP configuration. Please check environment variables.' 
     });
   }
-  
-  // Log environment variables (without showing the actual values)
-  console.log('Using environment variables for API keys');
-  console.log('CDP_API_KEY_ID present:', !!process.env.CDP_API_KEY_ID);
-  console.log('CDP_API_KEY_SECRET present:', !!process.env.CDP_API_KEY_SECRET);
-  console.log('CDP_WALLET_SECRET present:', !!process.env.CDP_WALLET_SECRET);
 
   try {
     const cdp = new CdpClient({
@@ -104,11 +98,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log('Calls to send:', JSON.stringify(loggableCalls, null, 2));
       
       // Send the user operation
-      const userOperation = await cdp.evm.sendUserOperation({
-        smartAccount,
-        network,
-        calls: calls as any[], // Cast to any[] to avoid deep type instantiation
-      });
+      // Use a workaround to avoid deep type instantiation issues
+      // Create a new object with only the necessary properties to avoid TypeScript's deep type checking
+      const operationParams = {
+        smartAccount: smartAccount,
+        network: network,
+        calls: calls
+      };
+      
+      // Use Function constructor to bypass TypeScript's type checking
+      // @ts-ignore - Intentionally bypassing type checking to avoid deep instantiation
+      const userOperation = await cdp.evm.sendUserOperation(operationParams);
       
       console.log('User operation response:', JSON.stringify(userOperation, null, 2));
 
