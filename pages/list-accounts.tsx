@@ -2,7 +2,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import styles from "../styles/Home.module.css";
 import { useState, useEffect } from 'react';
 
 const ListAccounts: NextPage = () => {
@@ -32,81 +31,93 @@ const ListAccounts: NextPage = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <>
       <Head>
         <title>List Accounts</title>
         <meta name="description" content="List Web3 Accounts" />
       </Head>
 
-      <main className={styles.main}>
-        <nav className={styles.nav}>
-          <Link href="/">Home</Link> |
-          <Link href="/create-account">Create Account</Link> |
-          <Link href="/transfer-funds">Transfer Funds</Link>
-        </nav>
+      <div className="max-w-4xl mx-auto py-6">
+        <h1 className="text-3xl font-bold mb-6">Your Accounts</h1>
 
-        <h1 className={styles.title}>Your Accounts</h1>
+        <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Select Account Type</h2>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="radio"
+                  value="EVM"
+                  checked={walletType === 'EVM'}
+                  onChange={(e) => setWalletType(e.target.value as 'EVM' | 'SOLANA')}
+                  className="h-4 w-4 text-primary"
+                />
+                <span>EVM (Ethereum, Base, etc.)</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="radio"
+                  value="SOLANA"
+                  checked={walletType === 'SOLANA'}
+                  onChange={(e) => setWalletType(e.target.value as 'EVM' | 'SOLANA')}
+                  className="h-4 w-4 text-primary"
+                />
+                <span>Solana</span>
+              </label>
+            </div>
 
-        <div className={styles.walletTypeSelector}>
-          <label>Select Account Type:</label>
-          <div className={styles.radioGroup}>
-            <label>
-              <input
-                type="radio"
-                value="EVM"
-                checked={walletType === 'EVM'}
-                onChange={(e) => setWalletType(e.target.value as 'EVM' | 'SOLANA')}
-              />
-              EVM (Ethereum, Base, etc.)
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="SOLANA"
-                checked={walletType === 'SOLANA'}
-                onChange={(e) => setWalletType(e.target.value as 'EVM' | 'SOLANA')}
-              />
-              Solana
-            </label>
+            <button 
+              onClick={listAccounts} 
+              disabled={loading}
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+            >
+              {loading ? 'Loading...' : 'Refresh Accounts'}
+            </button>
           </div>
         </div>
 
-        <button 
-          onClick={listAccounts} 
-          disabled={loading}
-          className={styles.button}
-        >
-          {loading ? 'Loading...' : 'Refresh Accounts'}
-        </button>
-
-        {error && <p className={styles.error}>{error}</p>}
+        {error && (
+          <div className="bg-destructive/15 text-destructive rounded-md p-4 mb-6">
+            <p>{error}</p>
+          </div>
+        )}
 
         {accounts.length > 0 ? (
-          <div className={styles.accountsList}>
+          <div className="space-y-4">
             {accounts.map((acc, index) => (
-              <div key={index} className={styles.accountItem}>
-                <p><strong>Name:</strong> {acc.name}</p>
-                <p><strong>Address:</strong> {acc.address}</p>
-                <div className={styles.balances}>
-                  <p><strong>Balances:</strong></p>
-                  {acc.balances && acc.balances.length > 0 ? (
-                    acc.balances.map((balance, idx) => (
-                      <p key={idx}>
-                        {balance.formattedAmount || balance.amount} {balance.currency}
-                      </p>
-                    ))
-                  ) : (
-                    <p className={styles.noTokens}>No tokens found</p>
-                  )}
+              <div key={index} className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">{acc.name}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground break-all"><span className="font-medium">Address:</span> {acc.address}</p>
+                  
+                  <div className="mt-4">
+                    <h4 className="font-medium mb-2">Balances:</h4>
+                    {acc.balances && acc.balances.length > 0 ? (
+                      <div className="space-y-1">
+                        {acc.balances.map((balance, idx) => (
+                          <div key={idx} className="flex items-center justify-between py-1 border-b border-border/30 last:border-0">
+                            <span>{balance.currency}</span>
+                            <span className="font-medium">{balance.formattedAmount || balance.amount}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No tokens found</p>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p>No accounts found</p>
+          <div className="rounded-lg border border-border bg-card/50 text-card-foreground p-6 text-center">
+            <p className="text-muted-foreground">No accounts found</p>
+          </div>
         )}
-      </main>
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -2,7 +2,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import styles from "../styles/Home.module.css";
 import { useState, useEffect } from 'react';
 
 const TransferFunds: NextPage = () => {
@@ -67,89 +66,95 @@ const TransferFunds: NextPage = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <>
       <Head>
         <title>Transfer Funds</title>
         <meta name="description" content="Transfer Funds Between Accounts" />
       </Head>
 
-      <main className={styles.main}>
-        <nav className={styles.nav}>
-          <Link href="/">Home</Link> |
-          <Link href="/create-account">Create Account</Link> |
-          <Link href="/list-accounts">List Accounts</Link>
-        </nav>
+      <div className="max-w-4xl mx-auto py-6">
+        <h1 className="text-3xl font-bold mb-6">Transfer Funds</h1>
 
-        <h1 className={styles.title}>Transfer Funds</h1>
+        <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Send Transaction</h2>
 
-        <div className={styles.transferForm}>
-          <div className={styles.formGroup}>
-            <label>From Address:</label>
-            <select
-              value={fromAddress}
-              onChange={(e) => setFromAddress(e.target.value)}
-              className={styles.select}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">From Address:</label>
+              <select
+                value={fromAddress}
+                onChange={(e) => setFromAddress(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="">Select From Address</option>
+                {accounts.map((acc) => (
+                  <option key={acc.address} value={acc.address}>
+                    {acc.name} ({acc.address.substring(0, 6)}...{acc.address.substring(acc.address.length - 4)})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">To Address:</label>
+              <select
+                value={toAddress}
+                onChange={(e) => setToAddress(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="">Select To Address</option>
+                {accounts.map((acc) => (
+                  <option key={acc.address} value={acc.address}>
+                    {acc.name} ({acc.address.substring(0, 6)}...{acc.address.substring(acc.address.length - 4)})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Amount:</label>
+              <input
+                type="text"
+                value={transferAmount}
+                onChange={(e) => setTransferAmount(e.target.value)}
+                placeholder="Enter amount in ETH"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              />
+            </div>
+
+            <button
+              onClick={sendTransaction}
+              disabled={isTransferring || !accounts.length}
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full mt-2"
             >
-              <option value="">Select From Address</option>
-              {accounts.map((acc) => (
-                <option key={acc.address} value={acc.address}>
-                  {acc.name} ({acc.address})
-                </option>
-              ))}
-            </select>
+              {isTransferring ? 'Transferring...' : 'Send Transaction'}
+            </button>
           </div>
+        </div>
 
-          <div className={styles.formGroup}>
-            <label>To Address:</label>
-            <select
-              value={toAddress}
-              onChange={(e) => setToAddress(e.target.value)}
-              className={styles.select}
-            >
-              <option value="">Select To Address</option>
-              {accounts.map((acc) => (
-                <option key={acc.address} value={acc.address}>
-                  {acc.name} ({acc.address})
-                </option>
-              ))}
-            </select>
+        {error && (
+          <div className="bg-destructive/15 text-destructive rounded-md p-4 mb-6">
+            <p>{error}</p>
           </div>
+        )}
 
-          <div className={styles.formGroup}>
-            <label>Amount:</label>
-            <input
-              type="text"
-              value={transferAmount}
-              onChange={(e) => setTransferAmount(e.target.value)}
-              placeholder="Enter amount in ETH"
-              className={styles.input}
-            />
-          </div>
-
-          <button
-            onClick={sendTransaction}
-            disabled={isTransferring || !accounts.length}
-            className={styles.button}
-          >
-            {isTransferring ? 'Transferring...' : 'Send Transaction'}
-          </button>
-
-          {error && <p className={styles.error}>{error}</p>}
-
-          {txHash && (
+        {txHash && (
+          <div className="rounded-lg border border-green-500 bg-green-50 dark:bg-green-950/20 p-6 text-card-foreground shadow-sm">
             <p>
-              Transaction: <a 
+              <span className="font-medium">Transaction:</span>{' '}
+              <a 
                 href={`https://sepolia.basescan.org/tx/${txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="text-primary hover:underline"
               >
                 View on BaseScan
               </a>
             </p>
-          )}
-        </div>
-      </main>
-    </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
