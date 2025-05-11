@@ -23,7 +23,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="container flex h-14 max-w-screen-2xl items-center">
           <div className="mr-4 flex items-center">
             <Link href="/" className="mr-6 flex items-center space-x-2">
-              <span className="font-bold text-xl">Build Sig</span>
+              <span className="font-bold text-xl">SDK Toolkit</span>
             </Link>
             {/* Mobile menu button */}
             <button 
