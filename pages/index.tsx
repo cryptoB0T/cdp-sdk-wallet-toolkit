@@ -15,7 +15,7 @@ const Home: NextPage = () => {
       <div className="flex flex-col items-center justify-center py-12">
         <h1 className="text-4xl font-bold mb-8 text-center">Web3 Account Manager</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl w-full">
           <Link href="/create-account" className="block">
             <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 hover:border-primary hover:shadow-md transition-all">
               <h2 className="text-xl font-semibold mb-2">Create Account &rarr;</h2>
@@ -34,6 +34,13 @@ const Home: NextPage = () => {
             <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 hover:border-primary hover:shadow-md transition-all">
               <h2 className="text-xl font-semibold mb-2">Transfer Funds &rarr;</h2>
               <p className="text-muted-foreground">Send funds between your accounts</p>
+            </div>
+          </Link>
+
+          <Link href="/policy-management" className="block">
+            <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 hover:border-primary hover:shadow-md transition-all">
+              <h2 className="text-xl font-semibold mb-2">Policy Management &rarr;</h2>
+              <p className="text-muted-foreground">Create and manage contract policies</p>
             </div>
           </Link>
         </div>
