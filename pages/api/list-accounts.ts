@@ -71,7 +71,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             network: 'base-sepolia'
           });
 
-          console.log('Balance response:', JSON.stringify(balanceResponse, safeJsonReplacer, 2));
 
           // Initialize balances array
           const balances = [];

@@ -22,7 +22,8 @@ const CreateAccount: NextPage = () => {
       setLoading(true);
       setError('');
 
-      const response = await fetch('/api/create-wallet', {
+      // Using the direct API endpoint that uses environment variables
+      const response = await fetch('/api/create-wallet-direct', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
