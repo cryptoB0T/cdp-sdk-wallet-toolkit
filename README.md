@@ -1,24 +1,113 @@
-Welcome to the NextJS base template bootstrapped using the `create-next-app`. This template supports TypeScript, but you can use normal JavaScript as well.
+
+# CDP SDK Implementation Examples
+
+This project serves as a laboratory for exploring and implementing the Coinbase Developer Platform (CDP) SDK. It demonstrates various implementation methods using both the SDK directly and REST API endpoints.
+
+## Overview
+
+This experimental implementation showcases the CDP SDK's capabilities across multiple categories, providing practical examples for developers to understand and utilize the platform's features.
+
+## Features Implementation Status
+
+The project implements features across 7 major categories. Below is the current implementation status:
+
+### ✅ Fully Implemented Features
+
+#### Account Management
+- EVM account creation
+- Solana account creation
+- EVM Compatible Accounts (EOAs)
+- Solana Accounts
+- Account naming
+- Account listing
+
+#### Smart Accounts
+- EVM Smart Accounts
+- Smart account creation
+- User operation sending
+
+#### Security
+- Trusted Execution Environment (TEE)
+- Single Wallet Secret for all accounts
+
+#### Network Support
+- Multi-network support for EVM accounts
+- Solana account support
+
+#### Integration & Compatibility
+- viem compatibility
+- viem Wallet Client integration
+
+#### Other Features
+- USDC Rewards program integration (4.1% rewards)
+
+### 🚧 In Progress/Partial Implementation
+
+#### Account Management
+- Account retrieval by name
+- Pagination for account listing
+
+#### Smart Accounts
+- Smart account owner management
+- Batching calls within operations
+
+#### Transaction Management
+- Transaction signing and broadcasting
+- Automatic gas estimation
+- Nonce management
+- Solana transaction batching
+
+### ⏳ Planned Features
+
+#### Smart Accounts
+- Gas sponsorship (EVM)
+- Spend permissions (EVM)
 
 ## Getting Started
 
-Hit the run button to start the development server.
+1. Clone the repository
+2. Copy `.env.example` to `.env` and add your CDP credentials:
+   - CDP_API_KEY_ID
+   - CDP_API_KEY_SECRET
+   - CDP_WALLET_SECRET
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+3. Install dependencies:
+```bash
+npm install
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on `/api/hello`. This endpoint can be edited in `pages/api/hello.ts`.
+4. Start the development server:
+```bash
+npm run dev
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Implementation Examples
 
-## Learn More
+### SDK Methods
+The project showcases SDK implementations in `/pages/api/`:
+- `create-wallet.ts`: Direct SDK wallet creation
+- `create-smart-account.ts`: Smart account creation
+- `send-user-operation.ts`: User operation handling
 
-To learn more about Next.js, take a look at the following resources:
+### REST API Methods
+REST API implementations can be found in:
+- `create-wallet-direct.ts`: Direct API wallet creation
+- `list-accounts.ts`: Account listing via API
+- `send-transaction.ts`: Transaction sending via API
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-## Productionizing your Next App
+```
+├── components/        # React components
+├── pages/            # Next.js pages and API routes
+├── lib/              # Utility functions and configurations
+└── docs/            # Implementation documentation
+```
 
-To make your next App run smoothly in production make sure to deploy your project with [Repl Deployments](https://docs.replit.com/hosting/deployments/about-deployments)!
+## Development
 
-You can also produce a production build by running `npm run build` and [changing the run command](https://docs.replit.com/programming-ide/configuring-repl#run) to `npm run start`.
+This project runs on Next.js and is hosted on Replit. The development server will be available at `http://0.0.0.0:3000`.
+
+## Contributing
+
+Feel free to explore, test, and contribute to this implementation examples project. Open issues for bugs or feature requests.
