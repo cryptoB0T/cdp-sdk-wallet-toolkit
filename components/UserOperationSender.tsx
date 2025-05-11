@@ -31,9 +31,10 @@ export default function UserOperationSender({ smartAccountAddress, network }: Us
   const [success, setSuccess] = useState('');
   const [userOpData, setUserOpData] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
+  const [useSimpleEndpoint, setUseSimpleEndpoint] = useState(false);
 
   const sendUserOperation = async () => {
-    if (!userOpData.trim()) {
+    if (!userOpData.trim() && !useSimpleEndpoint) {
       setError('Please enter user operation data');
       return;
     }
@@ -44,65 +45,73 @@ export default function UserOperationSender({ smartAccountAddress, network }: Us
       setSuccess('');
       setTransactionHash('');
 
-      // Parse the user operation data
-      let calls;
-      try {
-        calls = JSON.parse(userOpData);
-        
-        // Log the parsed data for debugging
-        console.log('Parsed user operation data:', calls);
-        
-        // Validate the structure
-        if (!Array.isArray(calls)) {
-          // If it's not an array, wrap it in an array
-          calls = [calls];
-          console.log('Wrapped in array:', calls);
-        }
-        
-        // Validate each call object
-        const isValid = calls.every(call => {
-          const hasTo = typeof call.to === 'string' && call.to.startsWith('0x');
-          const hasValue = call.value !== undefined;
-          const hasData = typeof call.data === 'string';
+      // Determine which endpoint to use
+      const endpoint = useSimpleEndpoint ? '/api/send-user-operation-simple' : '/api/send-user-operation';
+      console.log(`Using endpoint: ${endpoint}`);
+      
+      let requestBody: any = { smartAccountAddress, network };
+      
+      // Only parse user operation data if not using the simple endpoint
+      if (!useSimpleEndpoint) {
+        // Parse the user operation data
+        let calls;
+        try {
+          calls = JSON.parse(userOpData);
           
-          if (!hasTo || !hasValue || !hasData) {
-            console.log('Invalid call object:', call, { hasTo, hasValue, hasData });
-            return false;
+          // Log the parsed data for debugging
+          console.log('Parsed user operation data:', calls);
+          
+          // Validate the structure
+          if (!Array.isArray(calls)) {
+            // If it's not an array, wrap it in an array
+            calls = [calls];
+            console.log('Wrapped in array:', calls);
           }
-          return true;
-        });
-        
-        // Format values properly
-        calls = calls.map(call => ({
-          ...call,
-          // Ensure value is properly formatted
-          value: call.value.toString(),
-          // Ensure data is a hex string
-          data: call.data.startsWith('0x') ? call.data : '0x' + call.data
-        }));
-        
-        if (!isValid) {
-          setError('Invalid call object format. Each call must have "to" (address), "value" (amount), and "data" properties.');
+          
+          // Validate each call object
+          const isValid = calls.every(call => {
+            const hasTo = typeof call.to === 'string' && call.to.startsWith('0x');
+            const hasValue = call.value !== undefined;
+            const hasData = typeof call.data === 'string';
+            
+            if (!hasTo || !hasValue || !hasData) {
+              console.log('Invalid call object:', call, { hasTo, hasValue, hasData });
+              return false;
+            }
+            return true;
+          });
+          
+          // Format values properly
+          calls = calls.map(call => ({
+            ...call,
+            // Ensure value is properly formatted
+            value: call.value.toString(),
+            // Ensure data is a hex string
+            data: call.data.startsWith('0x') ? call.data : '0x' + call.data
+          }));
+          
+          if (!isValid) {
+            setError('Invalid call object format. Each call must have "to" (address), "value" (amount), and "data" properties.');
+            setLoading(false);
+            return;
+          }
+          
+          // Add calls to request body
+          requestBody.calls = calls;
+        } catch (err) {
+          console.error('JSON parse error:', err);
+          setError(`Invalid JSON format: ${err.message}. Please check your input.`);
           setLoading(false);
           return;
         }
-      } catch (err) {
-        console.error('JSON parse error:', err);
-        setError(`Invalid JSON format: ${err.message}. Please check your input.`);
-        setLoading(false);
-        return;
       }
 
-      const response = await fetch('/api/send-user-operation', {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          smartAccountAddress,
-          calls,
-          network
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
@@ -171,12 +180,35 @@ export default function UserOperationSender({ smartAccountAddress, network }: Us
         </div>
       </div>
 
+      <div className={styles.checkboxContainer}>
+        <input
+          type="checkbox"
+          id="useSimpleEndpoint"
+          checked={useSimpleEndpoint}
+          onChange={(e) => setUseSimpleEndpoint(e.target.checked)}
+        />
+        <label htmlFor="useSimpleEndpoint">
+          Use simplified endpoint (uses default call parameters)
+          <span className={styles.tooltipContainer}>
+            <span className={styles.tooltipIcon}>?</span>
+            <span className={styles.tooltipText}>
+              <strong>Technical Note:</strong> The simplified endpoint creates a new EVM account and smart account for each request. 
+              This is necessary because:<br/><br/>
+              1. Smart accounts require signing capabilities from their owner account<br/>
+              2. These signing capabilities must be available in the same session<br/>
+              3. When only an address is provided, we cannot retrieve the full account with signing capabilities<br/><br/>
+              In a production environment, you would need to implement secure key management to maintain account continuity across sessions.
+            </span>
+          </span>
+        </label>
+      </div>
+
       <button 
         onClick={sendUserOperation} 
-        disabled={loading || !smartAccountAddress}
+        disabled={loading || !smartAccountAddress || (!userOpData.trim() && !useSimpleEndpoint)}
         className={styles.button}
       >
-        {loading ? 'Sending...' : 'Send User Operation'}
+        {loading ? 'Sending...' : useSimpleEndpoint ? 'Send Simple User Operation' : 'Send User Operation'}
       </button>
 
       {error && <p className={styles.error}>{error}</p>}

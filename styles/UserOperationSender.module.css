@@ -119,3 +119,80 @@
   font-style: italic;
   margin: 5px 0;
 }
+
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f0f5ff;
+  border-radius: 4px;
+}
+
+.checkboxContainer input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.checkboxContainer label {
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tooltipContainer {
+  position: relative;
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.tooltipIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #0052ff;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: help;
+}
+
+.tooltipText {
+  visibility: hidden;
+  width: 350px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -175px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.tooltipText::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.tooltipContainer:hover .tooltipText {
+  visibility: visible;
+  opacity: 1;
+}

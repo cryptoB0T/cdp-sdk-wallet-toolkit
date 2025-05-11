@@ -69,26 +69,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     console.log('Fetching smart account:', smartAccountAddress);
-    // Get the smart account
-    const account = await cdp.evm.getAccount({ address: smartAccountAddress });
     
-    if (!account) {
-      console.log('Smart account not found');
-      return res.status(404).json({ error: 'Smart account not found' });
-    }
-    
-    // Create a smart account instance
-    const smartAccount = await cdp.evm.createSmartAccount({
-      owner: account,
-    });
-    
-    if (!smartAccount) {
-      console.log('Failed to create smart account instance');
-      return res.status(500).json({ error: 'Failed to create smart account instance' });
-    }
-
-    console.log('Sending user operation from smart account:', smartAccountAddress);
+    // According to the documentation, we need to work with the smart account directly
+    let smartAccount;
     try {
+      console.log('Attempting to get smart account by address:', smartAccountAddress);
+      
+      // Try to get the smart account directly using the address
+      smartAccount = await cdp.evm.getSmartAccount({ address: smartAccountAddress } as any);
+      
+      if (!smartAccount) {
+        console.log('Smart account not found by address, trying to find owner account');
+        
+        // If that fails, try to get the owner account first
+        const ownerAccount = await cdp.evm.getAccount({ address: smartAccountAddress });
+        
+        if (!ownerAccount) {
+          console.log('Owner account not found');
+          return res.status(404).json({ error: 'Account not found' });
+        }
+        
+        // Then create a smart account from the owner
+        smartAccount = await cdp.evm.createSmartAccount({
+          owner: ownerAccount,
+        });
+        
+        if (!smartAccount) {
+          console.log('Failed to create smart account from owner');
+          return res.status(500).json({ error: 'Failed to create smart account' });
+        }
+      }
+      
+      console.log('Successfully working with smart account:', smartAccount.address);
+      console.log('Sending user operation from smart account:', smartAccount.address);
       // Format calls for logging (in case they contain large data values)
       const loggableCalls = calls.map(call => ({
         to: call.to,
@@ -98,17 +111,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log('Calls to send:', JSON.stringify(loggableCalls, null, 2));
       
       // Send the user operation
-      // Use a workaround to avoid deep type instantiation issues
-      // Create a new object with only the necessary properties to avoid TypeScript's deep type checking
-      const operationParams = {
+      // Following the documentation exactly and ignoring TypeScript errors
+      console.log('Smart account type:', typeof smartAccount, Object.keys(smartAccount));
+      console.log('Network:', network);
+      console.log('Calls structure:', JSON.stringify(calls, null, 2));
+      
+      // @ts-ignore - Ignoring TypeScript errors to follow documentation exactly
+      const userOperation = await cdp.evm.sendUserOperation({
         smartAccount: smartAccount,
         network: network,
         calls: calls
-      };
-      
-      // Use Function constructor to bypass TypeScript's type checking
-      // @ts-ignore - Intentionally bypassing type checking to avoid deep instantiation
-      const userOperation = await cdp.evm.sendUserOperation(operationParams);
+      });
       
       console.log('User operation response:', JSON.stringify(userOperation, null, 2));
 
@@ -138,9 +151,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     } catch (error) {
       console.error('User Operation Error:', error);
+      
+      // Enhanced error logging
+      console.error('Error type:', typeof error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      
+      if (error.stack) {
+        console.error('Error stack:', error.stack);
+      }
+      
+      if (error.cause) {
+        console.error('Error cause:', error.cause);
+      }
+      
+      // Check if there's a more specific error code or details
+      const errorDetails = error.message || 'Unknown error';
+      const errorCode = error.code || 'UNKNOWN_ERROR';
+      
       res.status(500).json({ 
         error: 'Failed to send user operation. Please try again.',
-        details: error.message 
+        details: errorDetails,
+        code: errorCode,
+        // Include the request parameters for debugging
+        request: {
+          smartAccountAddress,
+          network,
+          callsCount: calls?.length || 0
+        }
       });
     }
   } catch (error) {
