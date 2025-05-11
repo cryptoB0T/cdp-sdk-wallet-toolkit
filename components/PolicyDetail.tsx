@@ -506,11 +506,12 @@ export default function PolicyDetail({ policy, mode, onClose, onSave }: PolicyDe
                                 >
                                   {criterion.type === 'ethValue' ? (
                                     <>
-                                      <option value="<=">&lt;=</option>
-                                      <option value=">=">&gt;=</option>
-                                      <option value="<">&lt;</option>
-                                      <option value=">">&gt;</option>
-                                      <option value="==">==</option>
+                                      <option value="<=">&lt;= (Maximum)</option>
+                                      <option value=">=">&gt;= (Minimum)</option>
+                                      <option value="<">&lt; (Less than)</option>
+                                      <option value=">">&gt; (Greater than)</option>
+                                      <option value="==">== (Exact match)</option>
+                                      <option value="between">Between (Min and Max)</option>
                                     </>
                                   ) : (
                                     <>
@@ -523,19 +524,50 @@ export default function PolicyDetail({ policy, mode, onClose, onSave }: PolicyDe
 
                               {/* Value */}
                               {criterion.type === 'ethValue' ? (
-                                <div>
-                                  <label className="block text-gray-700 text-xs font-medium mb-1">
-                                    ETH Value (Wei)
-                                  </label>
-                                  <input
-                                    type="text"
-                                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={criterion.ethValue}
-                                    onChange={(e) => updateCriterionProperty(ruleIndex, criterionIndex, 'ethValue', e.target.value)}
-                                    placeholder="1000000000000000000"
-                                    disabled={mode === 'view'}
-                                  />
-                                </div>
+                                criterion.operator === 'between' ? (
+                                  <div className="space-y-2">
+                                    <div>
+                                      <label className="block text-gray-700 text-xs font-medium mb-1">
+                                        Minimum ETH Value (Wei)
+                                      </label>
+                                      <input
+                                        type="text"
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        value={criterion.minEthValue || ''}
+                                        onChange={(e) => updateCriterionProperty(ruleIndex, criterionIndex, 'minEthValue', e.target.value)}
+                                        placeholder="1000000000000000000"
+                                        disabled={mode === 'view'}
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-gray-700 text-xs font-medium mb-1">
+                                        Maximum ETH Value (Wei)
+                                      </label>
+                                      <input
+                                        type="text"
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        value={criterion.maxEthValue || ''}
+                                        onChange={(e) => updateCriterionProperty(ruleIndex, criterionIndex, 'maxEthValue', e.target.value)}
+                                        placeholder="10000000000000000000"
+                                        disabled={mode === 'view'}
+                                      />
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div>
+                                    <label className="block text-gray-700 text-xs font-medium mb-1">
+                                      ETH Value (Wei)
+                                    </label>
+                                    <input
+                                      type="text"
+                                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      value={criterion.ethValue}
+                                      onChange={(e) => updateCriterionProperty(ruleIndex, criterionIndex, 'ethValue', e.target.value)}
+                                      placeholder="1000000000000000000"
+                                      disabled={mode === 'view'}
+                                    />
+                                  </div>
+                                )
                               ) : (
                                 <div>
                                   <label className="block text-gray-700 text-xs font-medium mb-1">
