@@ -1,3 +1,4 @@
+
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
@@ -101,56 +102,47 @@ const ListAccounts: NextPage = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold">{acc.name}</h3>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/create-smart-account', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                              ownerAddress: acc.address,
+                              network: 'base-sepolia'
+                            }),
+                          });
+                          const data = await response.json();
+                          if (!response.ok) throw new Error(data.error || 'Failed to create smart account');
+                          alert(`Smart account created! Address: ${data.smartAccountAddress}`);
+                        } catch (err: any) {
+                          alert('Failed to create smart account: ' + err.message);
+                        }
+                      }}
+                      className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                    >
+                      Create Smart Account
+                    </button>
                   </div>
                   <p className="text-sm text-muted-foreground break-all"><span className="font-medium">Address:</span> {acc.address}</p>
-
-                  {/* Smart Accounts Section */}
-                  <div className="mt-4 border-t pt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium">Smart Accounts:</h4>
-                      <button
-                        onClick={async () => {
-                          try {
-                            const response = await fetch('/api/create-smart-account', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ 
-                                ownerAddress: acc.address,
-                                network: 'base-sepolia'
-                              }),
-                            });
-                            const data = await response.json();
-                            if (!response.ok) throw new Error(data.error || 'Failed to create smart account');
-                            alert(`Smart account created! Address: ${data.smartAccountAddress}`);
-                            // Refresh the smart accounts list
-                            fetchSmartAccounts();
-                          } catch (err: any) {
-                            alert('Failed to create smart account: ' + err.message);
-                          }
-                        }}
-                        className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 text-sm"
-                      >
-                        Create Smart Account
-                      </button>
-                    </div>
-
-                    {smartAccounts.filter(sa => sa.owners[0]?.address.toLowerCase() === acc.address.toLowerCase()).length > 0 ? (
+                  
+                  {smartAccounts.filter(sa => sa.owners[0]?.address === acc.address).length > 0 && (
+                    <div className="mt-4 border-t pt-4">
+                      <h4 className="font-medium mb-2">Smart Accounts:</h4>
                       <div className="space-y-2">
                         {smartAccounts
-                          .filter(sa => sa.owners[0]?.address.toLowerCase() === acc.address.toLowerCase())
+                          .filter(sa => sa.owners[0]?.address === acc.address)
                           .map((sa, idx) => (
-                            <div key={idx} className="text-sm text-muted-foreground p-2 bg-muted/50 rounded">
-                              <span className="font-medium">Smart Account Address:</span> {sa.address}
+                            <div key={idx} className="text-sm text-muted-foreground">
+                              <span className="font-medium">Address:</span> {sa.address}
                             </div>
                           ))
                         }
                       </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">No smart accounts found</p>
-                    )}
-                  </div>
-
-                  <div className="mt-4 border-t pt-4">
+                    </div>
+                  )}
+                  <div className="mt-4">
                     <h4 className="font-medium mb-2">Balances:</h4>
                     {acc.balances && acc.balances.length > 0 ? (
                       <div className="space-y-1">
