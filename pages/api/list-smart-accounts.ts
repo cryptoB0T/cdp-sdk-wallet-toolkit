@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { CdpClient } from "@coinbase/cdp-sdk";
+import { getApiKeys } from '../../lib/api-config';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -10,11 +11,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { pageSize, pageToken } = req.query;
 
   try {
+    // Get API keys from local storage or environment variables
+    const { apiKeyId, apiKeySecret, walletSecret } = getApiKeys();
+    
+    if (!apiKeyId || !apiKeySecret || !walletSecret) {
+      return res.status(500).json({ 
+        error: 'Missing CDP configuration. Please check API keys in settings or environment variables.' 
+      });
+    }
+
     // Initialize CDP client
     const cdp = new CdpClient({
-      apiKeyId: process.env.CDP_API_KEY_ID,
-      apiKeySecret: process.env.CDP_API_KEY_SECRET,
-      walletSecret: process.env.CDP_WALLET_SECRET,
+      apiKeyId,
+      apiKeySecret,
+      walletSecret,
     });
 
     // Call the listSmartAccounts API

@@ -1,6 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { CdpClient } from "@coinbase/cdp-sdk";
+import { getApiKeys } from '../../lib/api-config';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -13,17 +14,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Owner address is required' });
   }
 
-  if (!process.env.CDP_API_KEY_ID || !process.env.CDP_API_KEY_SECRET || !process.env.CDP_WALLET_SECRET) {
-    return res.status(500).json({ 
-      error: 'Missing CDP configuration. Please check environment variables.' 
-    });
-  }
-
   try {
+    // Get API keys from local storage or environment variables
+    const apiKeysResult = getApiKeys();
+    const { apiKeyId, apiKeySecret, walletSecret, source } = apiKeysResult;
+    
+    // Log API keys in a safe way (only showing first few characters)
+    console.log('API Key ID (first 8 chars):', apiKeyId ? apiKeyId.substring(0, 8) + '...' : 'undefined');
+    console.log('API Key Secret (first 8 chars):', apiKeySecret ? apiKeySecret.substring(0, 8) + '...' : 'undefined');
+    console.log('Wallet Secret (first 8 chars):', walletSecret ? walletSecret.substring(0, 8) + '...' : 'undefined');
+    console.log('API keys source:', source);
+    
+    if (!apiKeyId || !apiKeySecret || !walletSecret) {
+      console.error('Missing one or more required API keys');
+      return res.status(500).json({ 
+        error: 'Missing CDP configuration. Please check API keys in settings or environment variables.' 
+      });
+    }
+
     const cdp = new CdpClient({
-      apiKeyId: process.env.CDP_API_KEY_ID,
-      apiKeySecret: process.env.CDP_API_KEY_SECRET,
-      walletSecret: process.env.CDP_WALLET_SECRET,
+      apiKeyId,
+      apiKeySecret,
+      walletSecret,
     });
 
     console.log('Fetching owner account for address:', ownerAddress);
