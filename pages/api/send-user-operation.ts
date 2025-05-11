@@ -98,11 +98,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log('Calls to send:', JSON.stringify(loggableCalls, null, 2));
       
       // Send the user operation
-      const userOperation = await cdp.evm.sendUserOperation({
+      // Use a type assertion with unknown to break the deep type instantiation
+      const sendUserOpParams = {
         smartAccount,
         network,
-        calls: calls as any[], // Cast to any[] to avoid deep type instantiation
-      });
+        calls
+      } as unknown as Parameters<typeof cdp.evm.sendUserOperation>[0];
+      
+      const userOperation = await cdp.evm.sendUserOperation(sendUserOpParams);
       
       console.log('User operation response:', JSON.stringify(userOperation, null, 2));
 

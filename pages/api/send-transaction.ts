@@ -1,9 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { CdpClient } from "@coinbase/cdp-sdk";
-import { createWalletClient, http, parseEther } from "viem";
-import { toAccount } from "viem/accounts";
-import { baseSepolia } from "viem/chains";
+import { parseEther } from "viem";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -19,22 +17,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       walletSecret: process.env.CDP_WALLET_SECRET,
     });
 
-    const account = await cdp.evm.getAccount({ address: fromAddress });
+    // Use CDP's native transaction sending capabilities
+    const txResult = await cdp.evm.sendTransaction({
+      address: fromAddress,
+      network: req.body.network || "base-sepolia",
+      transaction: {
+        to: toAddress,
+        value: parseEther(amount)
+      }
+    });
     
-    const walletClient = createWalletClient({
-      account: toAccount(account),
-      chain: baseSepolia,
-      transport: http(),
-    });
-
-    const hash = await walletClient.sendTransaction({
-      to: toAddress,
-      value: parseEther(amount),
-    });
+    const transactionHash = txResult.transactionHash;
 
     res.status(200).json({ 
-      transactionHash: hash,
-      explorerUrl: `https://sepolia.basescan.org/tx/${hash}`
+      transactionHash,
+      explorerUrl: `https://sepolia.basescan.org/tx/${transactionHash}`
     });
   } catch (error: any) {
     console.error('Send transaction error:', error);
