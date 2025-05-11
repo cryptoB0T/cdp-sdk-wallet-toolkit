@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { CdpClient } from "@coinbase/cdp-sdk";
-import { getApiKeys } from '../../lib/api-config';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -56,36 +55,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Network is required' });
   }
 
-  try {
-    // Get API keys from local storage or environment variables
-    const { apiKeyId, apiKeySecret, walletSecret } = getApiKeys();
-    
-    if (!apiKeyId || !apiKeySecret || !walletSecret) {
-      return res.status(500).json({ 
-        error: 'Missing CDP configuration. Please check API keys in settings or environment variables.' 
-      });
-    }
+  if (!process.env.CDP_API_KEY_ID || !process.env.CDP_API_KEY_SECRET || !process.env.CDP_WALLET_SECRET) {
+    return res.status(500).json({ 
+      error: 'Missing CDP configuration. Please check environment variables.' 
+    });
+  }
+  
+  // Log environment variables (without showing the actual values)
+  console.log('Using environment variables for API keys');
+  console.log('CDP_API_KEY_ID present:', !!process.env.CDP_API_KEY_ID);
+  console.log('CDP_API_KEY_SECRET present:', !!process.env.CDP_API_KEY_SECRET);
+  console.log('CDP_WALLET_SECRET present:', !!process.env.CDP_WALLET_SECRET);
 
+  try {
     const cdp = new CdpClient({
-      apiKeyId,
-      apiKeySecret,
-      walletSecret,
+      apiKeyId: process.env.CDP_API_KEY_ID,
+      apiKeySecret: process.env.CDP_API_KEY_SECRET,
+      walletSecret: process.env.CDP_WALLET_SECRET,
     });
 
     console.log('Fetching smart account:', smartAccountAddress);
     // Get the smart account
-    let account;
-    try {
-      account = await cdp.evm.getAccount({ address: smartAccountAddress });
-      console.log('Account retrieved successfully:', account.address);
-    } catch (error) {
-      console.error('Error retrieving account:', error);
-      return res.status(404).json({ 
-        error: 'Smart account not found', 
-        details: error.message,
-        tip: 'Make sure you have valid CDP API keys configured and the smart account address is correct.'
-      });
-    }
+    const account = await cdp.evm.getAccount({ address: smartAccountAddress });
     
     if (!account) {
       console.log('Smart account not found');
@@ -113,14 +104,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log('Calls to send:', JSON.stringify(loggableCalls, null, 2));
       
       // Send the user operation
-      // Use a type assertion with unknown to break the deep type instantiation
-      const sendUserOpParams = {
+      const userOperation = await cdp.evm.sendUserOperation({
         smartAccount,
         network,
-        calls
-      } as unknown as Parameters<typeof cdp.evm.sendUserOperation>[0];
-      
-      const userOperation = await cdp.evm.sendUserOperation(sendUserOpParams);
+        calls: calls as any[], // Cast to any[] to avoid deep type instantiation
+      });
       
       console.log('User operation response:', JSON.stringify(userOperation, null, 2));
 
