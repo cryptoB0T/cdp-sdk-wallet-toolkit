@@ -39,104 +39,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     console.log('Fetching owner account for address:', ownerAddress);
-    
     // First validate the owner account exists
+    let ownerAccount;
     try {
-      const ownerAccount = await cdp.evm.getAccount({ address: ownerAddress });
+      ownerAccount = await cdp.evm.getAccount({ address: ownerAddress });
       console.log('Owner account response:', ownerAccount);
-      
-      if (!ownerAccount) {
-        console.log('Owner account not found');
-        return res.status(404).json({ error: 'Owner account not found' });
-      }
-      
-      // Choose which method to use - REST API or SDK
-      const useRestApi = true; // Set to true to use REST API, false to use SDK
-      
-      if (useRestApi) {
-        // Use the REST API directly with fetch instead of the SDK
-        console.log('Using direct REST API to create smart account for owner:', ownerAddress);
-        
-        try {
-          // Create API key header using base64 encoding of apiKeyId:apiKeySecret
-          const apiKeyHeader = Buffer.from(`${apiKeyId}:${apiKeySecret}`).toString('base64');
-          
-          // Use the specified network or default to base-sepolia
-          const targetNetwork = network || 'base-sepolia';
-          
-          const response = await fetch('https://api.cdp.coinbase.com/platform/v2/evm/smart-accounts', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'Authorization': `Basic ${apiKeyHeader}`
-            },
-            body: JSON.stringify({
-              owner_address: ownerAddress,
-              network: targetNetwork
-            })
-          });
-          
-          if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Error creating smart account via REST API:', errorData);
-            return res.status(response.status).json({
-              error: 'Failed to create smart account via REST API',
-              details: errorData
-            });
-          }
-          
-          // const smartAccountData = await response.json();
-          // console.log('Smart account created successfully via REST API:', smartAccountData);
-          
-          // return res.status(200).json({
-          //   success: true,
-          //   smartAccountAddress: smartAccountData.address,
-          //   network: targetNetwork,
-          //   createdVia: 'REST API'
-          // });
-        } catch (error) {
-          console.error('Exception when calling REST API:', error);
-          return res.status(500).json({
-            error: 'Exception when creating smart account via REST API',
-            details: error.message
-          });
-        }
-      } else {
-        // Use the SDK approach
-        console.log('Creating smart account for owner via SDK:', ownerAddress);
-        try {
-          // Create smart account with specific network config
-          const smartAccount = await cdp.evm.createSmartAccount({
-            owner: ownerAccount
-          });
-          
-          console.log('Smart account response:', smartAccount);
-
-          if (!smartAccount) {
-            throw new Error('Failed to create smart account - no response from CDP');
-          }
-
-          return res.status(200).json({ 
-            success: true,
-            smartAccountAddress: smartAccount.address,
-            network: network || 'base-sepolia',
-            createdVia: 'SDK'
-          });
-        } catch (error) {
-          console.error('Smart Account Creation Error:', error);
-          return res.status(500).json({ 
-            error: 'Failed to create smart account. Please try again.',
-            details: error.message 
-          });
-        }
-      }
     } catch (error) {
       console.error('Error retrieving owner account:', error);
       return res.status(404).json({ 
         error: 'Owner account not found', 
         details: error.message,
         tip: 'Make sure you have valid CDP API keys configured and the owner address is correct.'
+      });
+    }
+    
+    if (!ownerAccount) {
+      console.log('Owner account not found');
+      return res.status(404).json({ error: 'Owner account not found' });
+    }
+
+    console.log('Creating smart account for owner:', ownerAddress);
+    try {
+      // Create smart account with specific network config
+      const smartAccount = await cdp.evm.createSmartAccount({
+        owner: ownerAccount
+      });
+      
+      console.log('Smart account response:', smartAccount);
+
+      if (!smartAccount) {
+        throw new Error('Failed to create smart account - no response from CDP');
+      }
+
+      res.status(200).json({ 
+        smartAccountAddress: smartAccount.address,
+        network: network || 'base-sepolia'
+      });
+    } catch (error) {
+      console.error('Smart Account Creation Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to create smart account. Please try again.',
+        details: error.message 
       });
     }
   } catch (error) {
