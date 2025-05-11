@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { CdpClient } from "@coinbase/cdp-sdk";
+import { getApiKeys } from '../../lib/api-config';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -55,22 +56,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Network is required' });
   }
 
-  if (!process.env.CDP_API_KEY_ID || !process.env.CDP_API_KEY_SECRET || !process.env.CDP_WALLET_SECRET) {
-    return res.status(500).json({ 
-      error: 'Missing CDP configuration. Please check environment variables.' 
-    });
-  }
-
   try {
+    // Get API keys from local storage or environment variables
+    const { apiKeyId, apiKeySecret, walletSecret } = getApiKeys();
+    
+    if (!apiKeyId || !apiKeySecret || !walletSecret) {
+      return res.status(500).json({ 
+        error: 'Missing CDP configuration. Please check API keys in settings or environment variables.' 
+      });
+    }
+
     const cdp = new CdpClient({
-      apiKeyId: process.env.CDP_API_KEY_ID,
-      apiKeySecret: process.env.CDP_API_KEY_SECRET,
-      walletSecret: process.env.CDP_WALLET_SECRET,
+      apiKeyId,
+      apiKeySecret,
+      walletSecret,
     });
 
     console.log('Fetching smart account:', smartAccountAddress);
     // Get the smart account
-    const account = await cdp.evm.getAccount({ address: smartAccountAddress });
+    let account;
+    try {
+      account = await cdp.evm.getAccount({ address: smartAccountAddress });
+      console.log('Account retrieved successfully:', account.address);
+    } catch (error) {
+      console.error('Error retrieving account:', error);
+      return res.status(404).json({ 
+        error: 'Smart account not found', 
+        details: error.message,
+        tip: 'Make sure you have valid CDP API keys configured and the smart account address is correct.'
+      });
+    }
     
     if (!account) {
       console.log('Smart account not found');

@@ -19,20 +19,17 @@ export default function Layout({ children }: LayoutProps) {
               <span className="font-bold text-xl">Build Sig</span>
             </Link>
             <nav className="flex items-center space-x-6 text-sm font-medium">
-              <Link href="/" className="transition-colors hover:text-foreground/80">
-                Home
+              <Link href="/list-accounts" className="transition-colors hover:text-foreground/80">
+                List Accounts
               </Link>
               <Link href="/create-account" className="transition-colors hover:text-foreground/80">
                 Create Account
               </Link>
-              <Link href="/list-accounts" className="transition-colors hover:text-foreground/80">
-                List Accounts
-              </Link>
-              <Link href="/transfer-funds" className="transition-colors hover:text-foreground/80">
-                Transfer Funds
-              </Link>
               <Link href="/list-smart-accounts" className="transition-colors hover:text-foreground/80">
-                Smart Accounts
+                List Smart Accounts
+              </Link>
+              <Link href="/create-smart-account" className="transition-colors hover:text-foreground/80">
+                Create Smart Account
               </Link>
             </nav>
           </div>

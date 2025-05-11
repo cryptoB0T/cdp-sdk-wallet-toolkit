@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import UserOperationSender from '../components/UserOperationSender';
 
 interface SmartAccount {
   address: string;
@@ -11,6 +12,7 @@ export default function ListSmartAccounts() {
   const [accounts, setAccounts] = useState<SmartAccount[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [activeAccount, setActiveAccount] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSmartAccounts();
@@ -28,6 +30,14 @@ export default function ListSmartAccounts() {
       setError(err.message || 'Failed to fetch smart accounts');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleUserOperation = (accountAddress: string) => {
+    if (activeAccount === accountAddress) {
+      setActiveAccount(null);
+    } else {
+      setActiveAccount(accountAddress);
     }
   };
 
@@ -64,6 +74,21 @@ export default function ListSmartAccounts() {
                   <p className="text-sm text-muted-foreground break-all">
                     <span className="font-medium">Owner Address:</span> {account.owners[0]?.address}
                   </p>
+                  <div className="mt-4">
+                    <button
+                      onClick={() => toggleUserOperation(account.address)}
+                      className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                    >
+                      {activeAccount === account.address ? 'Hide User Operation' : 'Send User Operation'}
+                    </button>
+                  </div>
+                  
+                  {activeAccount === account.address && (
+                    <UserOperationSender 
+                      smartAccountAddress={account.address} 
+                      network="base-sepolia" 
+                    />
+                  )}
                 </div>
               </div>
             ))}

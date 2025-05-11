@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { CdpClient } from "@coinbase/cdp-sdk";
+import { getApiKeys } from '../../lib/api-config';
 
 // Helper function to format token amounts with proper decimals
 function formatAmount(amount: string, decimals: number): string {
@@ -33,10 +34,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { type } = req.query;
 
   try {
+    // Get API keys from local storage or environment variables
+    const { apiKeyId, apiKeySecret, walletSecret } = getApiKeys();
+    
+    if (!apiKeyId || !apiKeySecret || !walletSecret) {
+      return res.status(500).json({ 
+        error: 'Missing CDP configuration. Please check API keys in settings or environment variables.' 
+      });
+    }
+
     const cdp = new CdpClient({
-      apiKeyId: process.env.CDP_API_KEY_ID,
-      apiKeySecret: process.env.CDP_API_KEY_SECRET,
-      walletSecret: process.env.CDP_WALLET_SECRET,
+      apiKeyId,
+      apiKeySecret,
+      walletSecret,
     });
 
     // Custom replacer for BigInt serialization
@@ -61,7 +71,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             network: 'base-sepolia'
           });
 
-          console.log('Balance response:', JSON.stringify(balanceResponse, safeJsonReplacer, 2));
 
           // Initialize balances array
           const balances = [];
