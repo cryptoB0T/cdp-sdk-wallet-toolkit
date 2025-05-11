@@ -28,11 +28,14 @@ export default function Layout({ children }: LayoutProps) {
               <Link href="/list-accounts" className="transition-colors hover:text-foreground/80">
                 List Accounts
               </Link>
-              <Link href="/transfer-funds" className="transition-colors hover:text-foreground/80">
-                Transfer Funds
-              </Link>
               <Link href="/list-smart-accounts" className="transition-colors hover:text-foreground/80">
-                Smart Accounts
+                List Smart Accounts
+              </Link>
+              <Link href="/create-account" className="transition-colors hover:text-foreground/80">
+                Create Account
+              </Link>
+              <Link href="/create-smart-account" className="transition-colors hover:text-foreground/80">
+                Create Smart Account
               </Link>
             </nav>
           </div>
