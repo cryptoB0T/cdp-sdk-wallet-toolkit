@@ -51,6 +51,9 @@ export default function Layout({ children }: LayoutProps) {
               <Link href="/create-smart-account" className="transition-colors hover:text-foreground/80">
                 Create Smart Account
               </Link>
+              <Link href="/policy-management" className="transition-colors hover:text-foreground/80">
+                Policy Management
+              </Link>
             </nav>
           </div>
           <div className="flex flex-1 items-center justify-end space-x-2">
@@ -91,6 +94,13 @@ export default function Layout({ children }: LayoutProps) {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Create Smart Account
+              </Link>
+              <Link 
+                href="/policy-management" 
+                className="block py-2 transition-colors hover:text-foreground/80"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Policy Management
               </Link>
             </div>
           </div>
