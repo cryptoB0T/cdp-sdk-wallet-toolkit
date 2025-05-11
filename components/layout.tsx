@@ -19,15 +19,6 @@ export default function Layout({ children }: LayoutProps) {
               <span className="font-bold text-xl">Build Sig</span>
             </Link>
             <nav className="flex items-center space-x-6 text-sm font-medium">
-              <Link href="/" className="transition-colors hover:text-foreground/80">
-                Home
-              </Link>
-              <Link href="/create-account" className="transition-colors hover:text-foreground/80">
-                Create Account
-              </Link>
-              <Link href="/" className="transition-colors hover:text-foreground/80">
-                Home
-              </Link>
               <Link href="/list-accounts" className="transition-colors hover:text-foreground/80">
                 List Accounts
               </Link>
