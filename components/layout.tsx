@@ -25,14 +25,17 @@ export default function Layout({ children }: LayoutProps) {
               <Link href="/create-account" className="transition-colors hover:text-foreground/80">
                 Create Account
               </Link>
+              <Link href="/" className="transition-colors hover:text-foreground/80">
+                Home
+              </Link>
               <Link href="/list-accounts" className="transition-colors hover:text-foreground/80">
                 List Accounts
               </Link>
-              <Link href="/list-smart-accounts" className="transition-colors hover:text-foreground/80">
-                List Smart Accounts
-              </Link>
               <Link href="/create-account" className="transition-colors hover:text-foreground/80">
                 Create Account
+              </Link>
+              <Link href="/list-smart-accounts" className="transition-colors hover:text-foreground/80">
+                List Smart Accounts
               </Link>
               <Link href="/create-smart-account" className="transition-colors hover:text-foreground/80">
                 Create Smart Account
