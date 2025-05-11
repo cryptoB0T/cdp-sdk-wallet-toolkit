@@ -119,3 +119,21 @@
   font-style: italic;
   margin: 5px 0;
 }
+
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f0f5ff;
+  border-radius: 4px;
+}
+
+.checkboxContainer input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.checkboxContainer label {
+  font-size: 14px;
+  cursor: pointer;
+}
