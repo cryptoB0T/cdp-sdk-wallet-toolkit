@@ -39,9 +39,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('Creating smart account for owner:', ownerAddress);
     try {
       // Create smart account with specific network config
-      const smartAccount = await cdp.evm.createAccount({
-        name: `smart-${Date.now()}`,
-        type: 'smart'
+      const smartAccount = await cdp.evm.createSmartAccount({
+        owner: ownerAccount
       });
       
       console.log('Smart account response:', smartAccount);

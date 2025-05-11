@@ -27,12 +27,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(200).json({ account: newAccount, transactionHash });
     } else if (type === 'SOLANA') {
       const newAccount = await cdp.solana.getOrCreateAccount({ name });
-      const { transactionHash } = await cdp.solana.requestFaucet({
+      // For Solana, the network is not specified in requestFaucet options
+      // It defaults to devnet for the Solana faucet
+      const faucetResult = await cdp.solana.requestFaucet({
         address: newAccount.address,
-        network: "solana-devnet",
-        token: "sol",
+        token: "sol"
       });
 
+      // The Solana faucet result has a signature property instead of transactionHash
+      const transactionHash = faucetResult.signature || '';
       res.status(200).json({ account: newAccount, transactionHash });
     } else {
       res.status(400).json({ error: 'Invalid wallet type' });

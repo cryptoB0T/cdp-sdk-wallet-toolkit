@@ -74,7 +74,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               
               // Format the balance with proper decimals
               const rawAmount = balanceItem.amount?.amount || '0';
-              const decimals = parseInt(balanceItem.amount?.decimals || '18', 10);
+              // Convert decimals to string before parsing to handle bigint type
+              const decimalsStr = String(balanceItem.amount?.decimals || '18');
+              const decimals = parseInt(decimalsStr, 10);
               
               // Add to balances array
               balances.push({
