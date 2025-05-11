@@ -6,13 +6,7 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-function ApiKeysDialog() {
-  return (
-    <div>
-      <button>Set API Keys</button>
-    </div>
-  );
-}
+import { ApiKeysDialog } from './ui/api-keys-dialog';
 
 export default function Layout({ children }: LayoutProps) {
   return (
