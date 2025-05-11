@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, DollarSign, Wallet, PiggyBank } from 'lucide-react';
 import PolicyList from '../components/PolicyList';
 import PolicyDetail from '../components/PolicyDetail';
 import PolicyTester from '../components/PolicyTester';
+import DonationPolicyCreator from '../components/DonationPolicyCreator';
+import SavingsPolicyCreator from '../components/SavingsPolicyCreator';
 
 interface Policy {
   id: string;
@@ -18,6 +20,8 @@ interface Policy {
 export default function PolicyManagementPage() {
   const [selectedPolicy, setSelectedPolicy] = useState<Policy | undefined>(undefined);
   const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create' | null>(null);
+  const [showDonationCreator, setShowDonationCreator] = useState(false);
+  const [showSavingsCreator, setShowSavingsCreator] = useState(false);
   const [showTester, setShowTester] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -35,6 +39,20 @@ export default function PolicyManagementPage() {
   const handleCreatePolicy = () => {
     setSelectedPolicy(undefined);
     setModalMode('create');
+    setShowDonationCreator(false);
+    setShowSavingsCreator(false);
+  };
+
+  const handleCreateDonationPolicy = () => {
+    setModalMode(null);
+    setShowDonationCreator(true);
+    setShowSavingsCreator(false);
+  };
+
+  const handleCreateSavingsPolicy = () => {
+    setModalMode(null);
+    setShowDonationCreator(false);
+    setShowSavingsCreator(true);
   };
 
   const handleViewPolicy = (policy: Policy) => {
@@ -169,6 +187,36 @@ export default function PolicyManagementPage() {
     setModalMode(null);
   };
 
+  const closeDonationCreator = () => {
+    setShowDonationCreator(false);
+  };
+
+  const closeSavingsCreator = () => {
+    setShowSavingsCreator(false);
+  };
+
+  const handleDonationPolicySuccess = (policyId: string) => {
+    setNotification({
+      type: 'success',
+      message: 'Donation policy created successfully!'
+    });
+    setRefreshTrigger(prev => prev + 1);
+    setTimeout(() => {
+      setShowDonationCreator(false);
+    }, 1500);
+  };
+
+  const handleSavingsPolicySuccess = (policyId: string) => {
+    setNotification({
+      type: 'success',
+      message: 'Savings policy created successfully!'
+    });
+    setRefreshTrigger(prev => prev + 1);
+    setTimeout(() => {
+      setShowSavingsCreator(false);
+    }, 1500);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Head>
@@ -208,17 +256,34 @@ export default function PolicyManagementPage() {
             <ul className="list-disc pl-5 space-y-1">
               <li><strong>Project-level policies:</strong> Apply to all accounts in the project</li>
               <li><strong>Account-level policies:</strong> Apply only to specific accounts</li>
+              <li><strong>Min/Max policies:</strong> Set minimum and maximum transaction values</li>
+              <li><strong>Donation policies:</strong> Automatically donate a percentage of each transaction</li>
+              <li><strong>Savings policies:</strong> Automatically save a percentage of each transaction</li>
             </ul>
           </div>
         </div>
 
-        <div className="flex justify-end mb-4">
+        <div className="flex flex-wrap justify-end mb-4 gap-3">
+          <button
+            onClick={handleCreateSavingsPolicy}
+            className="flex items-center bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition-colors"
+          >
+            <PiggyBank size={18} className="mr-1" />
+            Create Savings Policy
+          </button>
+          <button
+            onClick={handleCreateDonationPolicy}
+            className="flex items-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-colors"
+          >
+            <DollarSign size={18} className="mr-1" />
+            Create Donation Policy
+          </button>
           <button
             onClick={handleCreatePolicy}
             className="flex items-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
           >
             <Plus size={18} className="mr-1" />
-            Create New Policy
+            Create Standard Policy
           </button>
         </div>
 
@@ -253,6 +318,20 @@ export default function PolicyManagementPage() {
           mode={modalMode}
           onClose={closeModal}
           onSave={handleSavePolicy}
+        />
+      )}
+
+      {showDonationCreator && (
+        <DonationPolicyCreator
+          onClose={closeDonationCreator}
+          onSuccess={handleDonationPolicySuccess}
+        />
+      )}
+
+      {showSavingsCreator && (
+        <SavingsPolicyCreator
+          onClose={closeSavingsCreator}
+          onSuccess={handleSavingsPolicySuccess}
         />
       )}
     </div>
