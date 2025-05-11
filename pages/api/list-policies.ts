@@ -44,19 +44,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       
       try {
         // Call the CDP SDK to list policies
-        const policies = await cdp.policies.listPolicies({
+        const response = await cdp.policies.listPolicies({
           scope: scope as 'project' | 'account' | undefined
         });
         
-        // Ensure policies is always an array
-        const policiesArray = Array.isArray(policies) ? policies : [];
+        // Log the policies for debugging
+        console.log('Policies response:', JSON.stringify(response, null, 2));
         
-        console.log(`Found ${policiesArray.length} policies`);
+        // Extract the policies array from the response
+        // The CDP SDK might return the policies directly or in a nested structure
+        const policies = Array.isArray(response) ? response : 
+                        (response.policies ? response.policies : []);
+        
+        console.log(`Found ${policies.length} policies`);
         
         return res.status(200).json({
           success: true,
-          policies: policiesArray,
-          count: policiesArray.length
+          policies: policies,
+          count: policies.length
         });
       } catch (error) {
         console.error('Error in listPolicies:', error);
