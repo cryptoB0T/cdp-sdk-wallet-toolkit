@@ -5,6 +5,18 @@
  
 @layer base {
   :root {
+    --font-advent: 'Advent Pro', sans-serif;
+    --font-maitree: 'Maitree', serif;
+  }
+  
+  body {
+    font-family: var(--font-maitree);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-advent);
+  }
+  :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;

@@ -6,6 +6,8 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+import { ApiKeysDialog } from './ui/api-keys-dialog';
+
 export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen">
@@ -31,6 +33,7 @@ export default function Layout({ children }: LayoutProps) {
             </nav>
           </div>
           <div className="flex flex-1 items-center justify-end space-x-2">
+            <ApiKeysDialog />
             <ThemeToggle />
           </div>
         </div>
