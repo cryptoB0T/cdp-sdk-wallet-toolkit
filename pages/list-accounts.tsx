@@ -2,7 +2,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const ListAccounts: NextPage = () => {
   const [accounts, setAccounts] = useState([]);
@@ -10,11 +10,7 @@ const ListAccounts: NextPage = () => {
   const [error, setError] = useState('');
   const [walletType, setWalletType] = useState<'EVM' | 'SOLANA'>('EVM');
 
-  useEffect(() => {
-    listAccounts();
-  }, [walletType]);
-
-  const listAccounts = async () => {
+  const listAccounts = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/list-accounts?type=${walletType}`);
@@ -28,7 +24,11 @@ const ListAccounts: NextPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [walletType]);
+
+  useEffect(() => {
+    listAccounts();
+  }, [listAccounts]);
 
   return (
     <>
