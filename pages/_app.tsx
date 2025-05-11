@@ -4,6 +4,7 @@ import '../styles/test.css'
 import type { AppProps } from 'next/app'
 import { ThemeProvider } from '../components/ui/theme-provider'
 import Layout from '../components/layout'
+import { WalletProvider } from '../components/providers/WalletProvider'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -13,9 +14,11 @@ function MyApp({ Component, pageProps }: AppProps) {
       enableSystem
       disableTransitionOnChange
     >
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <WalletProvider>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </WalletProvider>
     </ThemeProvider>
   )
 }

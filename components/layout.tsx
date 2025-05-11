@@ -1,6 +1,7 @@
 import React from 'react';
 import { ThemeToggle } from './ui/theme-toggle';
 import Link from 'next/link';
+import { ConnectWallet } from './ui/connect-wallet';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -33,6 +34,7 @@ export default function Layout({ children }: LayoutProps) {
             </nav>
           </div>
           <div className="flex flex-1 items-center justify-end space-x-2">
+            <ConnectWallet />
             <ApiKeysDialog />
             <ThemeToggle />
           </div>
