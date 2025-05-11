@@ -1,0 +1,85 @@
+
+The CDP Wallet API documentation describes **40 distinct features** across 7 categories:
+
+- Account Management (8 features)
+- Smart Accounts (7 features)
+- Transaction Management (8 features)
+- Security (7 features)
+- Network Support (5 features)
+- Integration & Compatibility (4 features)
+- Other Features (1 feature)
+
+## Account Management
+
+| #   | Feature                        | Source File     | Implemented | Priority | Notes |
+| --- | ------------------------------ | --------------- | ----------- | -------- | ----- |
+| 1   | EVM account creation           | 2-quickstart.md | ✅           |          |       |
+| 2   | Solana account creation        | 2-quickstart.md | ✅           |          |       |
+| 3   | EVM Compatible Accounts (EOAs) | 3-accounts.md   | ✅           |          |       |
+| 4   | Solana Accounts                | 3-accounts.md   | ✅           |          |       |
+| 5   | Account naming                 | 6-accounts.md   | ✅           |          |       |
+| 6   | Account retrieval by name      | 6-accounts.md   | ❓           |          |       |
+| 7   | Account listing                | 6-accounts.md   | ✅           |          |       |
+| 8   | Pagination for account listing | 6-accounts.md   | ❓           |          |       |
+
+## Smart Accounts
+
+| #   | Feature                                       | Source File   | Implemented | Priority | Notes                      |
+| --- | --------------------------------------------- | ------------- | ----------- | -------- | -------------------------- |
+| 1   | EVM Smart Accounts                            | 3-accounts.md | ✅           |          |                            |
+| 2   | Smart account owner management                | 3-accounts.md | ❓           |          |                            |
+| 3   | Smart account creation                        | 9-smart.md    | ✅           |          |                            |
+| 4   | User operation sending                        | 9-smart.md    | ✅           |          |                            |
+| 5   | Batching calls within a single user operation | 9-smart.md    | ❓           |          |                            |
+| 6   | Gas sponsorship (EVM)                         | 1-welcome.md  | ❌           |          | Mentioned as "coming soon" |
+| 7   | Spend permissions (EVM)                       | 1-welcome.md  | ❌           |          | Mentioned as "coming soon" |
+
+## Transaction Management
+
+| #   | Feature                                             | Source File     | Implemented | Priority | Notes |
+| --- | --------------------------------------------------- | --------------- | ----------- | -------- | ----- |
+| 1   | EVM transaction sending                             | 2-quickstart.md | ✅           |          |       |
+| 2   | Solana transaction sending                          | 2-quickstart.md | ✅           |          |       |
+| 3   | Automatic gas estimation                            | 8-sending.md    | ❓           |          |       |
+| 4   | Nonce management                                    | 8-sending.md    | ❓           |          |       |
+| 5   | Transaction signing                                 | 8-sending.md    | ❓           |          |       |
+| 6   | Transaction broadcasting                            | 8-sending.md    | ❓           |          |       |
+| 7   | Solana transaction batching (multiple instructions) | 11-batching.md  | ❓           |          |       |
+| 8   | Solana transaction signing                          | 11-batching.md  | ❓           |          |       |
+
+## Security
+
+| #   | Feature                                      | Source File   | Implemented | Priority | Notes |
+| --- | -------------------------------------------- | ------------- | ----------- | -------- | ----- |
+| 1   | Trusted Execution Environment (TEE)          | 4-security.md | ✅           |          |       |
+| 2   | Single Wallet Secret for all accounts        | 1-welcome.md  | ✅           |          |       |
+| 3   | Wallet Secret authentication                 | 4-security.md | ❓           |          |       |
+| 4   | Two-factor authentication (2FA)              | 4-security.md | ❓           |          |       |
+| 5   | Secret rotation for lost/compromised secrets | 4-security.md | ❓           |          |       |
+| 6   | Wallet Secret rotation                       | 7-rotate.md   | ❓           |          |       |
+| 7   | 2FA management                               | 7-rotate.md   | ❓           |          |       |
+
+## Network Support
+
+| #   | Feature                                    | Source File     | Implemented | Priority | Notes |
+| --- | ------------------------------------------ | --------------- | ----------- | -------- | ----- |
+| 1   | Multi-network support for EVM accounts     | 1-welcome.md    | ✅           |          |       |
+| 2   | Solana account support                     | 1-welcome.md    | ✅           |          |       |
+| 3   | Faucet API for EVM testnet tokens          | 2-quickstart.md | ❓           |          |       |
+| 4   | Faucet API for Solana testnet tokens       | 2-quickstart.md | ❓           |          |       |
+| 5   | Smart account funding (faucet integration) | 9-smart.md      | ❓           |          |       |
+
+## Integration & Compatibility
+
+| #   | Feature                                             | Source File  | Implemented | Priority | Notes |
+| --- | --------------------------------------------------- | ------------ | ----------- | -------- | ----- |
+| 1   | viem compatibility                                  | 1-welcome.md | ✅           |          |       |
+| 2   | viem Local Accounts as owners of CDP Smart Accounts | 10-viem.md   | ❓           |          |       |
+| 3   | CDP accounts wrapped into viem Custom Accounts      | 10-viem.md   | ❓           |          |       |
+| 4   | viem Wallet Client integration                      | 10-viem.md   | ✅           |          |       |
+
+## Other Features
+
+| #   | Feature                             | Source File  | Implemented | Priority | Notes |
+| --- | ----------------------------------- | ------------ | ----------- | -------- | ----- |
+| 1   | USDC Rewards program (4.1% rewards) | 5-rewards.md | ✅           |          |       |
