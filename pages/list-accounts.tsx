@@ -89,6 +89,28 @@ const ListAccounts: NextPage = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold">{acc.name}</h3>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/create-smart-account', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                              ownerAddress: acc.address,
+                              network: 'base-sepolia'
+                            }),
+                          });
+                          const data = await response.json();
+                          if (!response.ok) throw new Error(data.error || 'Failed to create smart account');
+                          alert(`Smart account created! Address: ${data.smartAccountAddress}`);
+                        } catch (err: any) {
+                          alert('Failed to create smart account: ' + err.message);
+                        }
+                      }}
+                      className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                    >
+                      Create Smart Account
+                    </button>
                   </div>
                   <p className="text-sm text-muted-foreground break-all"><span className="font-medium">Address:</span> {acc.address}</p>
                   
