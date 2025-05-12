@@ -32,6 +32,7 @@ export default function UserOperationSender({ smartAccountAddress, network }: Us
   const [userOpData, setUserOpData] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
   const [useSimpleEndpoint, setUseSimpleEndpoint] = useState(false);
+  const [activeSmartAccount, setActiveSmartAccount] = useState(smartAccountAddress);
 
   const sendUserOperation = async () => {
     if (!userOpData.trim() && !useSimpleEndpoint) {
@@ -120,8 +121,14 @@ export default function UserOperationSender({ smartAccountAddress, network }: Us
         throw new Error(data.error || 'Failed to send user operation');
       }
 
-      setTransactionHash(data.transactionHash);
-      setSuccess(`User operation sent successfully! Status: ${data.status}`);
+      // Store the transaction hash and user operation hash
+      setTransactionHash(data.transactionHash || data.userOpHash);
+      setSuccess(`User operation sent successfully! UserOpHash: ${data.userOpHash}`);
+      
+      // Store the smart account address if it's returned from the API
+      if (data.smartAccountAddress) {
+        setActiveSmartAccount(data.smartAccountAddress);
+      }
     } catch (err) {
       setError(err.message || 'An error occurred while sending the user operation');
     } finally {
@@ -223,7 +230,21 @@ export default function UserOperationSender({ smartAccountAddress, network }: Us
             rel="noopener noreferrer"
             className={styles.link}
           >
-            View on Block Explorer
+            View Transaction on Block Explorer
+          </a>
+        </div>
+      )}
+      
+      {activeSmartAccount && activeSmartAccount !== smartAccountAddress && (
+        <div className={styles.transactionInfo}>
+          <p>New Smart Account: {activeSmartAccount}</p>
+          <a 
+            href={`https://${network === 'base-mainnet' ? '' : 'sepolia.'}basescan.org/address/${activeSmartAccount}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.link}
+          >
+            View Smart Account on Block Explorer
           </a>
         </div>
       )}
