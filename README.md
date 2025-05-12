@@ -1,3 +1,21 @@
+ There's no easy way to understand this for a noob.  The best way to explain this might actually be different depending on that individual's pre-existing knowledge. So I don't think there's a really straightforward way or universal way to make this all really easy to understand.
+
+ But in the spirit of paying it forward and to put this in writing so future me may be able to wrap my head around this if I forget how some of this works, I'm going to put some notes here.
+
+ These are four links that might be relevant, and there are absolutely more. 
+
+ So a smart wallet, which was in the wallet API v1, has essentially been superseded by a smart account. but the base stocks still identify it as a smart wallet and it is pretty much known as either a smart wallet or a smart account at this point. 
+
+ So, in an effort to make things easier for noobs to understand, then Coinbase has a very straightforward docs page for their wallet API v2, which is essentially their Coinbase SDK, which now has been renamed to cdp-sdk.
+
+ But the SDK will often be a few steps behind the functionality they expose via their REST APIs. And so, by nature, that will always be the case.
+
+ So, to really understand what's happening in their SDK, you would need some kind of CDP SDK API docs. But those having to be manually maintained will never be really as good as generated docs. Generated docs are almost like unit tests. They will live with the code, and when the code changes, the unit tests will also have to change. And when the code changes, the generated docs will change. But the manually handwritten docs will change depending on whenever that's manually done. So that's probably the least reliable source.
+
+- https://docs.base.org/identity/smart-wallet/quickstart
+- https://docs.cdp.coinbase.com/wallet-api-v2/docs/welcome
+- https://docs.cdp.coinbase.com/api-v2/docs/welcome
+- https://coinbase.github.io/cdp-sdk/typescript/
 
 # CDP SDK Implementation Examples
 
