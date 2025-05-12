@@ -1,3 +1,7 @@
+
+
+<img src=https://assets.rbl.ms/34660828/origin.gif />
+ 
  There's no easy way to understand this for a noob.  The best way to explain this might actually be different depending on that individual's pre-existing knowledge. So I don't think there's a really straightforward way or universal way to make this all really easy to understand.
 
  But in the spirit of paying it forward and to put this in writing so future me may be able to wrap my head around this if I forget how some of this works, I'm going to put some notes here.
