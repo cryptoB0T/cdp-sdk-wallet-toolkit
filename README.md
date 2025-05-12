@@ -128,7 +128,7 @@ REST API implementations can be found in:
 
 ## Development
 
-This project runs on Next.js and is hosted on Replit. The development server will be available at `http://0.0.0.0:3000`.
+This project runs on Next.js and is hosted on Vercel. 
 
 ## Contributing
 
